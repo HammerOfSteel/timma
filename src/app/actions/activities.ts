@@ -294,10 +294,41 @@ export async function toggleActivityComplete(activityId: string) {
   });
   if (!activity) return;
 
+  const nowCompleted = !activity.completed;
+
   await prisma.activity.update({
     where: { id: activityId },
-    data: { completed: !activity.completed },
+    data: { completed: nowCompleted },
   });
+
+  // Auto-earn/revoke points
+  if (activity.pointValue > 0) {
+    if (nowCompleted) {
+      // Check if points already earned for this activity today
+      const todayStart = new Date();
+      todayStart.setHours(0, 0, 0, 0);
+      const existing = await prisma.earnedPoint.findFirst({
+        where: { activityId, profileId: session.activeProfileId, createdAt: { gte: todayStart } },
+      });
+      if (!existing) {
+        await prisma.earnedPoint.create({
+          data: {
+            amount: activity.pointValue,
+            reason: `Slutfört: ${activity.title}`,
+            profileId: session.activeProfileId,
+            activityId,
+          },
+        });
+      }
+    } else {
+      // Revoke today's points for this activity
+      const todayStart = new Date();
+      todayStart.setHours(0, 0, 0, 0);
+      await prisma.earnedPoint.deleteMany({
+        where: { activityId, profileId: session.activeProfileId, createdAt: { gte: todayStart } },
+      });
+    }
+  }
 
   revalidatePath('/');
 }

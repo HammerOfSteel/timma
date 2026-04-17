@@ -59,7 +59,10 @@ model Profile {
   // Relations
   activities   Activity[]
   rewards      Reward[]
+  redemptions  Redemption[]
   earnedPoints EarnedPoint[]
+  badges       Badge[]
+  earnedBadges EarnedBadge[]
   todos        Todo[]
   kanbanBoards KanbanBoard[]
 }
@@ -158,6 +161,20 @@ model Reward {
 
   profileId String
   profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  redemptions Redemption[]
+}
+
+model Redemption {
+  id        String   @id @default(cuid())
+  cost      Int
+  createdAt DateTime @default(now())
+
+  profileId String
+  profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  rewardId String
+  reward   Reward @relation(fields: [rewardId], references: [id], onDelete: Cascade)
 }
 
 model EarnedPoint {
@@ -171,6 +188,33 @@ model EarnedPoint {
 
   activityId String?
   activity   Activity? @relation(fields: [activityId], references: [id], onDelete: SetNull)
+}
+
+model Badge {
+  id          String @id @default(cuid())
+  name        String
+  description String?
+  iconUrl     String?
+  criteria    String // e.g. "streak:7", "total:100", "daily:5"
+  createdAt   DateTime @default(now())
+
+  profileId String
+  profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  earnedBadges EarnedBadge[]
+}
+
+model EarnedBadge {
+  id        String   @id @default(cuid())
+  earnedAt  DateTime @default(now())
+
+  profileId String
+  profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  badgeId String
+  badge   Badge @relation(fields: [badgeId], references: [id], onDelete: Cascade)
+
+  @@unique([profileId, badgeId])
 }
 
 // ─── Themes ────────────────────────────────────────────────────────────

@@ -110,7 +110,8 @@ async function main() {
     await prisma.caregiver.create({
       data: {
         email: 'anna@example.com',
-        passwordHash: '$2b$10$placeholder_hash_for_seed_data_only',
+        // Password: timma123
+        passwordHash: '$2b$10$Qfka32TZBo/Y6TdfM1xyIeZXIpxefP/27VCzpleyGlnsmvWlIARl6',
         name: 'Anna Svensson',
         householdId: household.id,
       },

@@ -53,6 +53,9 @@ model Profile {
   sensoryMode  SensoryMode  @default(LOW_STIMULATION)
   rewardType   RewardType   @default(POINTS)
 
+  // Calendar integration
+  calendarToken String?  @unique // Secret token for iCal subscription URL
+
   // Relations
   activities   Activity[]
   rewards      Reward[]

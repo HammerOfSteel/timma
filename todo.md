@@ -50,9 +50,9 @@ The minimum viable product — a functional day planner with visual support that
 
 ### 1.6 Calendar Integration (MVP)
 
-- [ ] iCal export (generate .ics file for schedule)
-- [ ] Google Calendar sync (read/write via API)
-- [ ] Apple Calendar sync via iCal subscription URL
+- [x] iCal export (generate .ics file for schedule)
+- [x] Google Calendar sync (read/write via API)
+- [x] Apple Calendar sync via iCal subscription URL
 
 ### 1.7 PWA & Offline
 

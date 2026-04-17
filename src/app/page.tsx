@@ -87,6 +87,7 @@ export default async function HomePage() {
         themes={themes}
         currentThemeId={profile.themeId}
         currentSensoryMode={profile.sensoryMode as 'LOW_STIMULATION' | 'HIGH_ENGAGEMENT'}
+        calendarToken={profile.calendarToken}
       />
 
       <DaySchedule

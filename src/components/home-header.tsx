@@ -20,6 +20,7 @@ interface HomeHeaderProps {
   }[];
   currentThemeId: string | null;
   currentSensoryMode: 'LOW_STIMULATION' | 'HIGH_ENGAGEMENT';
+  calendarToken: string | null;
 }
 
 export function HomeHeader({
@@ -28,6 +29,7 @@ export function HomeHeader({
   themes,
   currentThemeId,
   currentSensoryMode,
+  calendarToken,
 }: HomeHeaderProps) {
   const [showSettings, setShowSettings] = useState(false);
   const theme = useTheme();
@@ -93,6 +95,7 @@ export function HomeHeader({
           themes={themes}
           currentThemeId={currentThemeId}
           currentSensoryMode={currentSensoryMode}
+          calendarToken={calendarToken}
           onClose={() => setShowSettings(false)}
         />
       )}

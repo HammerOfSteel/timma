@@ -46,7 +46,7 @@ Timma is a **Progressive Web App** that helps individuals with ADHD, autism, int
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/timma.git
+git clone https://github.com/HammerOfSteel/timma.git
 cd timma
 
 # Install dependencies

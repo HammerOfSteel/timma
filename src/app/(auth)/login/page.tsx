@@ -1,11 +1,11 @@
 'use client';
 
-import { useActionState } from 'react';
+import { useActionState, useState } from 'react';
 import { login } from '@/app/actions/auth';
-import Link from 'next/link';
 
 export default function LoginPage() {
   const [state, action, pending] = useActionState(login, undefined);
+  const [showAbout, setShowAbout] = useState(false);
 
   return (
     <div className="flex min-h-full flex-1 items-center justify-center px-4 py-12">
@@ -70,11 +70,50 @@ export default function LoginPage() {
         </form>
 
         <p className="text-center text-sm text-gray-600">
-          Har du inget konto?{' '}
-          <Link href="/signup" className="font-medium text-indigo-600 hover:text-indigo-500">
-            Skapa konto
-          </Link>
+          {/* <Link href="/signup">Skapa konto</Link> */}
+          <button
+            type="button"
+            onClick={() => setShowAbout(true)}
+            className="font-medium text-indigo-600 hover:text-indigo-500"
+          >
+            Om Timma
+          </button>
         </p>
+
+        {showAbout && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => setShowAbout(false)}>
+            <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+              <h2
+                className="text-3xl font-bold text-center"
+                style={{ fontFamily: 'var(--font-fredoka), sans-serif' }}
+              >
+                <span className="bg-gradient-to-r from-purple-600 via-violet-500 to-emerald-500 bg-clip-text text-transparent">
+                  TIMMA
+                </span>
+              </h2>
+              <div className="mt-4 space-y-3 text-sm text-gray-600">
+                <p>
+                  <strong>Timma</strong> är en visuell dagsplanerare designad med särskilt fokus på
+                  personer med NPF (neuropsykiatriska funktionsnedsättningar).
+                </p>
+                <p>
+                  Med hjälp av bildstöd (PECS-symboler), tydlig struktur och visuella scheman gör
+                  Timma det enklare att förstå och följa sin dag.
+                </p>
+                <p className="text-xs text-gray-400 text-center pt-2">
+                  🚧 Alpha-version — under aktiv utveckling
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowAbout(false)}
+                className="mt-4 w-full rounded-lg bg-indigo-600 px-4 py-2 text-white font-medium hover:bg-indigo-700"
+              >
+                Stäng
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

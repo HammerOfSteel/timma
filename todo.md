@@ -76,10 +76,10 @@ Building out the full feature set beyond basic scheduling.
 
 ### 2.2 Kanban Board
 
-- [ ] Kanban view for tasks/todos
-- [ ] Customizable columns (e.g., To Do, Doing, Done)
-- [ ] Drag-and-drop between columns
-- [ ] Link kanban tasks to schedule activities
+- [x] Kanban view for tasks/todos
+- [x] Customizable columns (e.g., To Do, Doing, Done)
+- [x] Drag-and-drop between columns
+- [x] Link kanban tasks to schedule activities
 
 ### 2.3 Reward System (Belöningssystem)
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 const IMAGES = [
   '/images/bg1.jpg',
@@ -16,49 +16,44 @@ const IMAGES = [
 ];
 
 const INTERVAL = 30_000; // 30 seconds per image
-const FADE_DURATION = 2_000; // 2s crossfade
+const FADE_DURATION = 2000; // 2s crossfade
 
 export function BackgroundSlideshow() {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [nextIndex, setNextIndex] = useState(1);
-  const [fading, setFading] = useState(false);
-
-  const advance = useCallback(() => {
-    setFading(true);
-    setTimeout(() => {
-      setCurrentIndex((prev) => (prev + 1) % IMAGES.length);
-      setNextIndex((prev) => (prev + 1) % IMAGES.length);
-      setFading(false);
-    }, FADE_DURATION);
-  }, []);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    const timer = setInterval(advance, INTERVAL);
-    return () => clearInterval(timer);
-  }, [advance]);
+    timeoutRef.current = setInterval(() => {
+      setActiveIndex((prev) => (prev + 1) % IMAGES.length);
+    }, INTERVAL);
+    return () => {
+      if (timeoutRef.current) clearInterval(timeoutRef.current);
+    };
+  }, []);
+
+  // Preload next image
+  useEffect(() => {
+    const next = (activeIndex + 1) % IMAGES.length;
+    const img = new Image();
+    img.src = IMAGES[next];
+  }, [activeIndex]);
 
   return (
     <div className="absolute inset-0 overflow-hidden">
-      {/* Current image */}
-      <div
-        className="absolute inset-0 bg-cover bg-center transition-opacity"
-        style={{
-          backgroundImage: `url(${IMAGES[currentIndex]})`,
-          opacity: fading ? 0 : 1,
-          transitionDuration: `${FADE_DURATION}ms`,
-          filter: 'blur(4px)',
-          transform: 'scale(1.05)', // prevent blur edge artifacts
-        }}
-      />
-      {/* Next image (fades in underneath) */}
-      <div
-        className="absolute inset-0 bg-cover bg-center"
-        style={{
-          backgroundImage: `url(${IMAGES[nextIndex]})`,
-          filter: 'blur(4px)',
-          transform: 'scale(1.05)',
-        }}
-      />
+      {/* Stack all images, only the active one is visible */}
+      {IMAGES.map((src, i) => (
+        <div
+          key={src}
+          className="absolute inset-0 bg-cover bg-center"
+          style={{
+            backgroundImage: `url(${src})`,
+            opacity: i === activeIndex ? 1 : 0,
+            transition: `opacity ${FADE_DURATION}ms ease-in-out`,
+            filter: 'blur(6px)',
+            transform: 'scale(1.08)',
+          }}
+        />
+      ))}
       {/* Dark overlay for readability */}
       <div className="absolute inset-0 bg-black/40" />
     </div>

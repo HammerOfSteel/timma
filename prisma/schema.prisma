@@ -149,6 +149,7 @@ model Symbol {
   activities      Activity[]
   kanbanCards     KanbanCard[]
   favoriteSymbols FavoriteSymbol[]
+  todos           Todo[]
 }
 
 enum SymbolSource {
@@ -229,6 +230,9 @@ model EarnedPoint {
 
   activityId String?
   activity   Activity? @relation(fields: [activityId], references: [id], onDelete: SetNull)
+
+  todoId String?
+  todo   Todo? @relation(fields: [todoId], references: [id], onDelete: SetNull)
 }
 
 model Badge {
@@ -276,15 +280,23 @@ model Theme {
 // ─── Todos ─────────────────────────────────────────────────────────────
 
 model Todo {
-  id        String   @id @default(cuid())
-  title     String
-  completed Boolean  @default(false)
-  sortOrder Int      @default(0)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(cuid())
+  title       String
+  completed   Boolean  @default(false)
+  sortOrder   Int      @default(0)
+  pointValue  Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Visual support
+  symbolId String?
+  symbol   Symbol? @relation(fields: [symbolId], references: [id])
 
   profileId String
   profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  // Reward tracking
+  earnedPoints EarnedPoint[]
 }
 
 // ─── Kanban ────────────────────────────────────────────────────────────

@@ -108,10 +108,10 @@ Building out the full feature set beyond basic scheduling.
 
 ### 2.6 Todo List
 
-- [ ] Simple todo/checklist per user
-- [ ] Checkable items with optional symbols
-- [ ] Link todos to reward system
-- [ ] Caregiver and user can both add items (configurable permission)
+- [x] Simple todo/checklist per user
+- [x] Checkable items with optional symbols
+- [x] Link todos to reward system
+- [x] Caregiver and user can both add items (configurable permission)
 
 ---
 

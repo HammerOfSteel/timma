@@ -67,6 +67,12 @@ export function HomeHeader({
             >
               Belöningar
             </Link>
+            <Link
+              href="/todos"
+              className={`rounded-lg px-3 py-1.5 text-xs font-medium ${btnClass}`}
+            >
+              Att göra
+            </Link>
           </nav>
         </div>
         <div className="flex items-center gap-3">

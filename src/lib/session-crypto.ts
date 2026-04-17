@@ -7,6 +7,7 @@ export interface SessionPayload {
   caregiverId: string;
   householdId: string;
   activeProfileId?: string;
+  familyView?: boolean;
   expiresAt: Date;
 }
 

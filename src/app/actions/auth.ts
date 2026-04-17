@@ -109,7 +109,23 @@ export async function switchProfile(profileId: string, pin: string) {
     return { error: 'Felaktig PIN.' };
   }
 
-  await updateSession({ activeProfileId: profile.id });
+  await updateSession({ activeProfileId: profile.id, familyView: false });
+  redirect('/');
+}
+
+export async function switchToFamilyView() {
+  const session = await getSession();
+  if (!session) redirect('/login');
+
+  // Use the first profile in the household as the "active" profile for theme etc.
+  const firstProfile = await prisma.profile.findFirst({
+    where: { householdId: session.householdId },
+    orderBy: { createdAt: 'asc' },
+  });
+
+  if (!firstProfile) return { error: 'Inga profiler hittades.' };
+
+  await updateSession({ activeProfileId: firstProfile.id, familyView: true });
   redirect('/');
 }
 
@@ -128,12 +144,18 @@ export async function createProfile(formData: FormData) {
     return { error: 'PIN måste vara 4 siffror.' };
   }
 
+  // Default to Nature theme
+  const natureTheme = await prisma.theme.findFirst({
+    where: { name: 'Natur', isBuiltIn: true },
+  });
+
   await prisma.profile.create({
     data: {
       name: name.trim(),
       pin: pin || null,
       householdId: session.householdId,
       role: 'USER',
+      themeId: natureTheme?.id ?? null,
     },
   });
 

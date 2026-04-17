@@ -39,6 +39,7 @@ export function WeekView({ activities, weekStart }: WeekViewProps) {
   // Group activities by date
   const byDate = new Map<string, ActivityData[]>();
   for (const a of activities) {
+    if (!a.startTime) continue;
     const dateKey = a.startTime.split('T')[0];
     if (!byDate.has(dateKey)) byDate.set(dateKey, []);
     byDate.get(dateKey)!.push(a);
@@ -67,7 +68,7 @@ export function WeekView({ activities, weekStart }: WeekViewProps) {
           const dateKey = toDateStr(day);
           const dayActivities = byDate.get(dateKey) || [];
           const isToday = dateKey === todayStr;
-          const completedCount = dayActivities.filter((a) => a.completed).length;
+          const completedCount = dayActivities.filter((a) => a.status === 'DONE').length;
 
           return (
             <div
@@ -105,7 +106,7 @@ export function WeekView({ activities, weekStart }: WeekViewProps) {
                     key={a.id}
                     onClick={() => handleToggle(a.id)}
                     className={`flex w-full items-start gap-1 rounded-lg border-l-[3px] p-1.5 text-left text-xs transition hover:shadow-sm ${
-                      a.completed ? 'opacity-50' : ''
+                      a.status === 'DONE' ? 'opacity-50' : ''
                     }`}
                     style={{
                       borderLeftColor: a.color || '#6366f1',
@@ -116,16 +117,18 @@ export function WeekView({ activities, weekStart }: WeekViewProps) {
                       <div className="flex items-center gap-1">
                         <ActivityVisual symbol={a.symbol} imageUrl={a.imageUrl} size="sm" />
                         <span
-                          className={`truncate font-medium ${a.completed ? 'line-through text-gray-400' : ''}`}
+                          className={`truncate font-medium ${a.status === 'DONE' ? 'line-through text-gray-400' : ''}`}
                         >
                           {a.title}
                         </span>
                       </div>
-                      <div className="mt-0.5 text-[10px] text-gray-400">
-                        {formatTime(a.startTime)}
-                      </div>
+                      {a.startTime && (
+                        <div className="mt-0.5 text-[10px] text-gray-400">
+                          {formatTime(a.startTime)}
+                        </div>
+                      )}
                     </div>
-                    {a.completed && (
+                    {a.status === 'DONE' && (
                       <svg className="mt-0.5 h-3 w-3 shrink-0 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                       </svg>

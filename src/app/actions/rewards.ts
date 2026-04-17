@@ -50,7 +50,7 @@ export async function getRewardData(profileId: string) {
   const todayEnd = new Date();
   todayEnd.setHours(23, 59, 59, 999);
   const todayCompleted = await prisma.activity.count({
-    where: { profileId, completed: true, startTime: { gte: todayStart }, endTime: { lte: todayEnd } },
+    where: { profileId, status: 'DONE', startTime: { gte: todayStart }, endTime: { lte: todayEnd } },
   });
 
   // This week completed
@@ -59,7 +59,7 @@ export async function getRewardData(profileId: string) {
   weekStart.setDate(weekStart.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
   weekStart.setHours(0, 0, 0, 0);
   const weekCompleted = await prisma.activity.count({
-    where: { profileId, completed: true, startTime: { gte: weekStart } },
+    where: { profileId, status: 'DONE', startTime: { gte: weekStart } },
   });
   const weekTotal = await prisma.activity.count({
     where: { profileId, startTime: { gte: weekStart }, endTime: { lte: todayEnd } },
@@ -112,7 +112,7 @@ async function calculateStreak(profileId: string): Promise<number> {
     const completed = await prisma.activity.count({
       where: {
         profileId,
-        completed: true,
+        status: 'DONE',
         startTime: { gte: dayStart },
         endTime: { lte: dayEnd },
       },
@@ -272,7 +272,7 @@ async function checkAndAwardBadges(profileId: string) {
   const todayEnd = new Date();
   todayEnd.setHours(23, 59, 59, 999);
   const todayCompleted = await prisma.activity.count({
-    where: { profileId, completed: true, startTime: { gte: todayStart }, endTime: { lte: todayEnd } },
+    where: { profileId, status: 'DONE', startTime: { gte: todayStart }, endTime: { lte: todayEnd } },
   });
 
   for (const badge of badges) {

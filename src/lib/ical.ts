@@ -7,9 +7,9 @@ interface ICalActivity {
   id: string;
   title: string;
   description: string | null;
-  startTime: Date;
-  endTime: Date;
-  completed: boolean;
+  startTime: Date | null;
+  endTime: Date | null;
+  status: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -73,6 +73,7 @@ export function generateICalFeed(profileName: string, activities: ICalActivity[]
   ];
 
   for (const activity of activities) {
+    if (!activity.startTime || !activity.endTime) continue;
     lines.push('BEGIN:VEVENT');
     lines.push(`UID:${activity.id}@timma.app`);
     lines.push(`DTSTAMP:${now}`);
@@ -82,7 +83,7 @@ export function generateICalFeed(profileName: string, activities: ICalActivity[]
     if (activity.description) {
       lines.push(`DESCRIPTION:${escapeText(activity.description)}`);
     }
-    if (activity.completed) {
+    if (activity.status === 'DONE') {
       lines.push('STATUS:COMPLETED');
     }
     lines.push(`CREATED:${formatDate(activity.createdAt)}`);

@@ -26,8 +26,8 @@ const COLORS = [
 ];
 
 export function ActivityForm({ date, activity, onSubmit, onClose }: ActivityFormProps) {
-  const startDate = activity ? new Date(activity.startTime) : null;
-  const endDate = activity ? new Date(activity.endTime) : null;
+  const startDate = activity?.startTime ? new Date(activity.startTime) : null;
+  const endDate = activity?.endTime ? new Date(activity.endTime) : null;
 
   const [color, setColor] = useState(activity?.color || '#6366f1');
   const [showSymbolPicker, setShowSymbolPicker] = useState(false);

@@ -19,6 +19,8 @@ interface DayScheduleProps {
   viewMode: 'BLOCKS' | 'CARDS' | 'TIMELINE';
   date: string;
   profileName: string;
+  isFamilyView?: boolean;
+  familyProfiles?: { id: string; name: string }[];
 }
 
 export function DaySchedule({ activities, viewMode, date, profileName }: DayScheduleProps) {
@@ -81,8 +83,8 @@ export function DaySchedule({ activities, viewMode, date, profileName }: DaySche
       <div className="flex items-center justify-between border-b border-gray-200 px-4 py-2">
         <p className="text-sm text-gray-500">
           {activities.length} aktivitet{activities.length !== 1 ? 'er' : ''}
-          {activities.filter((a) => a.completed).length > 0 &&
-            ` · ${activities.filter((a) => a.completed).length} klara`}
+          {activities.filter((a) => a.status === 'DONE').length > 0 &&
+            ` · ${activities.filter((a) => a.status === 'DONE').length} klara`}
         </p>
         <div className="flex items-center gap-2">
           {/* View mode switcher */}

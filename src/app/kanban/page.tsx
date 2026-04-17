@@ -15,7 +15,6 @@ export default async function KanbanPage() {
     where: { id: session.activeProfileId },
     include: { household: true, theme: true },
   });
-
   if (!profile) redirect('/profile-select');
 
   const themes = await prisma.theme.findMany({
@@ -23,7 +22,15 @@ export default async function KanbanPage() {
     orderBy: { name: 'asc' },
   });
 
-  const board = await getKanbanBoard(profile.id);
+  const isFamilyView = session.familyView === true;
+
+  const allProfiles = await prisma.profile.findMany({
+    where: { householdId: session.householdId },
+    select: { id: true, name: true },
+    orderBy: { createdAt: 'asc' },
+  });
+
+  const board = await getKanbanBoard(session.householdId);
 
   const isDark = profile.theme ? isColorDark(profile.theme.backgroundColor) : false;
 
@@ -48,40 +55,40 @@ export default async function KanbanPage() {
     title: col.title,
     color: col.color,
     sortOrder: col.sortOrder,
-    cards: col.cards.map((card) => ({
-      id: card.id,
-      title: card.title,
-      description: card.description,
-      color: card.color,
-      sortOrder: card.sortOrder,
-      symbol: card.symbol
-        ? { name: card.symbol.name, imageUrl: card.symbol.imageUrl }
-        : null,
-      imageUrl: card.imageUrl,
-      activity: card.activity
-        ? { id: card.activity.id, title: card.activity.title }
-        : null,
+    cards: col.activities.map((a) => ({
+      id: a.id,
+      title: a.title,
+      description: a.description,
+      color: a.color,
+      sortOrder: a.sortOrder,
+      status: a.status,
+      startTime: a.startTime?.toISOString() ?? null,
+      endTime: a.endTime?.toISOString() ?? null,
+      pointValue: a.pointValue,
+      profileId: a.profileId,
+      profileName: a.profile.name,
+      symbol: a.symbol ? { name: a.symbol.name, imageUrl: a.symbol.imageUrl } : null,
+      imageUrl: a.imageUrl,
     })),
   }));
 
   return (
     <ThemeProvider theme={themeData}>
       <HomeHeader
-        profileName={profile.name}
+        profileName={isFamilyView ? 'Familjen' : profile.name}
         householdName={profile.household.name}
         themes={themes}
         currentThemeId={profile.themeId}
         currentSensoryMode={profile.sensoryMode as 'LOW_STIMULATION' | 'HIGH_ENGAGEMENT'}
         calendarToken={profile.calendarToken}
+        familyView={isFamilyView}
+        familyProfiles={allProfiles}
+        activeFilterIds={allProfiles.map((p) => p.id)}
       />
 
-      {/* Page nav bar */}
       <div className="flex items-center justify-between border-b border-gray-200 px-4 py-2">
         <div className="flex items-center gap-3">
-          <a
-            href="/"
-            className="rounded-lg px-3 py-1.5 text-xs font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700"
-          >
+          <a href="/" className="rounded-lg px-3 py-1.5 text-xs font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700">
             ← Schema
           </a>
           <h2 className="text-sm font-semibold">Kanban</h2>
@@ -92,6 +99,7 @@ export default async function KanbanPage() {
         boardId={board.id}
         boardName={board.name}
         columns={serializedColumns}
+        profiles={allProfiles}
       />
     </ThemeProvider>
   );

@@ -45,7 +45,7 @@ export function ThemeProvider({
   return (
     <ThemeContext.Provider value={theme}>
       <div
-        className="flex min-h-full flex-1 flex-col"
+        className="flex min-h-screen flex-1 flex-col"
         style={{
           ...style,
           backgroundColor: colors?.backgroundColor,

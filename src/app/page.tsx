@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation';
 import { getSession } from '@/lib/session';
 import { prisma } from '@/lib/db';
-import { getActivitiesForRange } from '@/app/actions/activities';
+import { getActivitiesForRange, getActivitiesForRangeMultiProfile } from '@/app/actions/activities';
 import { DaySchedule } from '@/components/schedule/day-schedule';
 import { WeekView } from '@/components/schedule/week-view';
 import { MonthView } from '@/components/schedule/month-view';
@@ -27,7 +27,7 @@ function toDateStr(d: Date) {
 export default async function HomePage({
   searchParams,
 }: {
-  searchParams: Promise<{ view?: string; date?: string }>;
+  searchParams: Promise<{ view?: string; date?: string; profiles?: string }>;
 }) {
   const params = await searchParams;
   const session = await getSession();
@@ -36,12 +36,8 @@ export default async function HomePage({
 
   const profile = await prisma.profile.findUnique({
     where: { id: session.activeProfileId },
-    include: {
-      household: true,
-      theme: true,
-    },
+    include: { household: true, theme: true },
   });
-
   if (!profile) redirect('/profile-select');
 
   const themes = await prisma.theme.findMany({
@@ -49,7 +45,24 @@ export default async function HomePage({
     orderBy: { name: 'asc' },
   });
 
-  // Parse view mode and date from search params
+  const isFamilyView = session.familyView === true;
+
+  // Get all household profiles for family filter
+  const allProfiles = isFamilyView
+    ? await prisma.profile.findMany({
+        where: { householdId: session.householdId },
+        select: { id: true, name: true },
+        orderBy: { createdAt: 'asc' },
+      })
+    : [];
+
+  // Determine which profiles to show based on filter
+  const filterProfileIds = params.profiles
+    ? params.profiles.split(',').filter(Boolean)
+    : isFamilyView
+      ? allProfiles.map((p) => p.id)
+      : [profile.id];
+
   const view: ViewMode = (['day', 'week', 'month'].includes(params.view || '')
     ? (params.view as ViewMode)
     : 'day');
@@ -57,7 +70,6 @@ export default async function HomePage({
   const selectedDate = params.date ? new Date(params.date + 'T12:00:00') : new Date();
   const dateStr = toDateStr(selectedDate);
 
-  // Calculate date range based on view
   let rangeStart: Date;
   let rangeEnd: Date;
 
@@ -76,26 +88,40 @@ export default async function HomePage({
     rangeEnd.setHours(23, 59, 59, 999);
   }
 
-  const activities = await getActivitiesForRange(profile.id, rangeStart, rangeEnd);
+  // Fetch activities
+  let rawActivities: any[] = [];
+  if (isFamilyView && filterProfileIds.length > 1) {
+    rawActivities = await getActivitiesForRangeMultiProfile(filterProfileIds, rangeStart, rangeEnd);
+  } else if (filterProfileIds.length === 1) {
+    const acts = await getActivitiesForRange(filterProfileIds[0], rangeStart, rangeEnd);
+    rawActivities = acts.map((a) => ({
+      ...a,
+      profile: isFamilyView
+        ? allProfiles.find((p) => p.id === a.profileId) || { id: a.profileId, name: '?' }
+        : undefined,
+    }));
+  } else {
+    rawActivities = [];
+  }
 
-  // Serialize dates for client components
-  const serializedActivities: ActivityData[] = activities.map((a) => ({
+  const serializedActivities: ActivityData[] = rawActivities.map((a: any) => ({
     id: a.id,
     title: a.title,
     description: a.description,
     color: a.color,
-    startTime: a.startTime.toISOString(),
-    endTime: a.endTime.toISOString(),
-    completed: a.completed,
+    startTime: a.startTime?.toISOString() ?? null,
+    endTime: a.endTime?.toISOString() ?? null,
+    status: a.status,
     sortOrder: a.sortOrder,
     pointValue: a.pointValue,
     imageUrl: a.imageUrl,
     recurrence: (a.recurrence as ActivityData['recurrence']) ?? null,
+    profileId: a.profileId,
+    profileName: a.profile?.name ?? undefined,
     symbol: a.symbol ? { id: a.symbol.id, name: a.symbol.name, imageUrl: a.symbol.imageUrl } : null,
     signVideo: a.signVideo ? { id: a.signVideo.id, word: a.signVideo.word, videoUrl: a.signVideo.videoUrl } : null,
   }));
 
-  // Determine if theme is dark
   const isDark = profile.theme ? isColorDark(profile.theme.backgroundColor) : false;
 
   const themeData = profile.theme
@@ -119,12 +145,15 @@ export default async function HomePage({
   return (
     <ThemeProvider theme={themeData}>
       <HomeHeader
-        profileName={profile.name}
+        profileName={isFamilyView ? 'Familjen' : profile.name}
         householdName={profile.household.name}
         themes={themes}
         currentThemeId={profile.themeId}
         currentSensoryMode={profile.sensoryMode as 'LOW_STIMULATION' | 'HIGH_ENGAGEMENT'}
         calendarToken={profile.calendarToken}
+        familyView={isFamilyView}
+        familyProfiles={allProfiles}
+        activeFilterIds={filterProfileIds}
       />
 
       <DateNavigator view={view} date={dateStr} />
@@ -134,7 +163,9 @@ export default async function HomePage({
           activities={serializedActivities}
           viewMode={profile.viewMode as 'BLOCKS' | 'CARDS' | 'TIMELINE'}
           date={dateStr}
-          profileName={profile.name}
+          profileName={isFamilyView ? 'Familjen' : profile.name}
+          isFamilyView={isFamilyView}
+          familyProfiles={allProfiles}
         />
       )}
       {view === 'week' && (

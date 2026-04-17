@@ -25,14 +25,15 @@ export function BlockView({ activities, onToggleComplete, onEdit, onDelete }: Sc
   return (
     <div className="space-y-3 p-4">
       {activities.map((activity) => {
-        const duration = getDurationMinutes(activity.startTime, activity.endTime);
+        const isDone = activity.status === 'DONE';
+        const duration = activity.startTime && activity.endTime ? getDurationMinutes(activity.startTime, activity.endTime) : 60;
         const minHeight = Math.max(60, Math.min(duration * 1.5, 200));
 
         return (
           <div
             key={activity.id}
             className={`relative rounded-xl border-l-4 bg-white p-4 shadow-sm transition ${
-              activity.completed ? 'opacity-60' : ''
+              isDone ? 'opacity-60' : ''
             }`}
             style={{
               borderLeftColor: activity.color || '#6366f1',
@@ -44,12 +45,12 @@ export function BlockView({ activities, onToggleComplete, onEdit, onDelete }: Sc
                 <button
                   onClick={() => onToggleComplete(activity.id)}
                   className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 transition ${
-                    activity.completed
+                    isDone
                       ? 'border-green-500 bg-green-500 text-white'
                       : 'border-gray-300 hover:border-gray-400'
                   }`}
                 >
-                  {activity.completed && (
+                  {isDone && (
                     <svg
                       className="h-3.5 w-3.5"
                       fill="none"
@@ -76,14 +77,16 @@ export function BlockView({ activities, onToggleComplete, onEdit, onDelete }: Sc
                       />
                     )}
                     <h3
-                      className={`font-semibold ${activity.completed ? 'line-through text-gray-400' : ''}`}
+                      className={`font-semibold ${isDone ? 'line-through text-gray-400' : ''}`}
                     >
                       {activity.title}
                     </h3>
                   </div>
-                  <p className="mt-0.5 text-sm text-gray-500">
-                    {formatTime(activity.startTime)} – {formatTime(activity.endTime)}
-                  </p>
+                  {activity.startTime && activity.endTime && (
+                    <p className="mt-0.5 text-sm text-gray-500">
+                      {formatTime(activity.startTime)} – {formatTime(activity.endTime)}
+                    </p>
+                  )}
                   {activity.description && (
                     <p className="mt-1 text-sm text-gray-600">{activity.description}</p>
                   )}

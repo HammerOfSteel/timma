@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { switchProfile, createProfile } from '@/app/actions/auth';
+import { switchProfile, createProfile, switchToFamilyView } from '@/app/actions/auth';
 
 interface ProfileInfo {
   id: string;
@@ -121,6 +121,17 @@ export function ProfileGrid({ profiles }: { profiles: ProfileInfo[] }) {
             {profile.hasPin && <span className="text-xs text-gray-400">🔒</span>}
           </button>
         ))}
+
+        {/* Family view */}
+        <button
+          onClick={() => switchToFamilyView()}
+          className="flex flex-col items-center space-y-3 rounded-xl border-2 border-indigo-200 bg-indigo-50 p-4 transition hover:border-indigo-400 hover:bg-indigo-100"
+        >
+          <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-indigo-400 to-emerald-400 text-2xl font-bold text-white">
+            👨‍👩‍👧‍👦
+          </div>
+          <span className="text-sm font-medium text-indigo-700">Familjen</span>
+        </button>
 
         <button
           onClick={() => setShowAddForm(true)}

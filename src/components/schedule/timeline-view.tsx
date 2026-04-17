@@ -76,6 +76,8 @@ export function TimelineView({
 
         {/* Activity blocks */}
         {activities.map((activity) => {
+          if (!activity.startTime || !activity.endTime) return null;
+          const isDone = activity.status === 'DONE';
           const top = getTopOffset(activity.startTime);
           const height = getHeight(activity.startTime, activity.endTime);
 
@@ -83,7 +85,7 @@ export function TimelineView({
             <div
               key={activity.id}
               className={`absolute left-1 right-1 overflow-hidden rounded-lg border px-3 py-2 transition ${
-                activity.completed ? 'opacity-50' : ''
+                isDone ? 'opacity-50' : ''
               }`}
               style={{
                 top: `${top}px`,
@@ -99,10 +101,10 @@ export function TimelineView({
                       <button
                         onClick={() => onToggleComplete(activity.id)}
                         className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border ${
-                          activity.completed ? 'border-green-500 bg-green-500' : 'border-gray-400'
+                          isDone ? 'border-green-500 bg-green-500' : 'border-gray-400'
                         }`}
                       >
-                        {activity.completed && (
+                        {isDone && (
                           <svg
                             className="h-2.5 w-2.5 text-white"
                             fill="none"
@@ -120,7 +122,7 @@ export function TimelineView({
                         size="sm"
                       />
                       <span
-                        className={`truncate text-sm font-semibold ${activity.completed ? 'line-through text-gray-400' : ''}`}
+                        className={`truncate text-sm font-semibold ${isDone ? 'line-through text-gray-400' : ''}`}
                       >
                         {activity.title}
                       </span>

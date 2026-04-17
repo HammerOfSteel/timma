@@ -31,6 +31,7 @@ export function MonthView({ activities, year, month }: MonthViewProps) {
   // Group activities by date
   const byDate = new Map<string, ActivityData[]>();
   for (const a of activities) {
+    if (!a.startTime) continue;
     const dateKey = a.startTime.split('T')[0];
     if (!byDate.has(dateKey)) byDate.set(dateKey, []);
     byDate.get(dateKey)!.push(a);
@@ -65,7 +66,7 @@ export function MonthView({ activities, year, month }: MonthViewProps) {
           const dateStr = toDateStr(year, month, day);
           const dayActivities = byDate.get(dateStr) || [];
           const isToday = dateStr === todayStr;
-          const completedCount = dayActivities.filter((a) => a.completed).length;
+          const completedCount = dayActivities.filter((a) => a.status === 'DONE').length;
 
           return (
             <button
@@ -97,7 +98,7 @@ export function MonthView({ activities, year, month }: MonthViewProps) {
                     <div
                       key={a.id}
                       className={`truncate rounded px-1 py-0.5 text-[10px] text-white ${
-                        a.completed ? 'opacity-50' : ''
+                        a.status === 'DONE' ? 'opacity-50' : ''
                       }`}
                       style={{ backgroundColor: a.color || '#6366f1' }}
                     >

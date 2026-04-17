@@ -22,7 +22,7 @@ export async function GET() {
   }
 
   const activities = await prisma.activity.findMany({
-    where: { profileId: profile.id },
+    where: { profileId: profile.id, startTime: { not: null } },
     orderBy: { startTime: 'asc' },
   });
 

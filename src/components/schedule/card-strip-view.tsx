@@ -17,18 +17,19 @@ export function CardStripView({
 }: ScheduleViewProps) {
   const now = new Date();
   const sorted = [...activities].sort(
-    (a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime(),
+    (a, b) => (a.startTime ? new Date(a.startTime).getTime() : 0) - (b.startTime ? new Date(b.startTime).getTime() : 0),
   );
 
   // Find the current/next activity
   const currentIndex = sorted.findIndex((a) => {
+    if (!a.startTime || !a.endTime) return false;
     const start = new Date(a.startTime);
     const end = new Date(a.endTime);
     return now >= start && now <= end;
   });
 
   const nextIndex =
-    currentIndex >= 0 ? currentIndex : sorted.findIndex((a) => new Date(a.startTime) > now);
+    currentIndex >= 0 ? currentIndex : sorted.findIndex((a) => a.startTime && new Date(a.startTime) > now);
 
   if (activities.length === 0) {
     return (
@@ -57,6 +58,7 @@ export function CardStripView({
           }
 
           const isNow = i === nextIndex;
+          const isDone = activity.status === 'DONE';
 
           return (
             <div
@@ -64,7 +66,7 @@ export function CardStripView({
               className={`flex min-w-[220px] max-w-[280px] shrink-0 flex-col rounded-2xl border-2 p-5 transition ${
                 isNow
                   ? 'scale-105 border-green-400 bg-green-50 shadow-lg'
-                  : activity.completed
+                  : isDone
                     ? 'border-gray-200 bg-gray-50 opacity-60'
                     : 'border-gray-200 bg-white shadow-sm'
               }`}
@@ -89,7 +91,7 @@ export function CardStripView({
                       style={{ backgroundColor: activity.color || '#6366f1' }}
                     />
                     <h3
-                      className={`text-lg font-bold ${activity.completed ? 'line-through text-gray-400' : ''}`}
+                      className={`text-lg font-bold ${isDone ? 'line-through text-gray-400' : ''}`}
                     >
                       {activity.title}
                     </h3>
@@ -97,9 +99,11 @@ export function CardStripView({
                 </div>
               </div>
 
-              <p className="mt-1 text-sm text-gray-500">
-                {formatTime(activity.startTime)} – {formatTime(activity.endTime)}
-              </p>
+              {activity.startTime && activity.endTime && (
+                <p className="mt-1 text-sm text-gray-500">
+                  {formatTime(activity.startTime)} – {formatTime(activity.endTime)}
+                </p>
+              )}
 
               {activity.description && (
                 <p className="mt-2 text-sm text-gray-600">{activity.description}</p>
@@ -115,12 +119,12 @@ export function CardStripView({
                 <button
                   onClick={() => onToggleComplete(activity.id)}
                   className={`flex-1 rounded-lg px-3 py-1.5 text-sm font-medium transition ${
-                    activity.completed
+                    isDone
                       ? 'bg-gray-200 text-gray-600'
                       : 'bg-green-500 text-white hover:bg-green-600'
                   }`}
                 >
-                  {activity.completed ? 'Ångra' : 'Klar!'}
+                  {isDone ? 'Ångra' : 'Klar!'}
                 </button>
                 <button
                   onClick={() => onEdit(activity)}

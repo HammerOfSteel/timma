@@ -20,6 +20,7 @@ model Household {
 
   caregiver Caregiver?
   profiles  Profile[]
+  kanbanBoards KanbanBoard[]
 }
 
 model Caregiver {
@@ -38,7 +39,7 @@ model Profile {
   id        String   @id @default(cuid())
   name      String
   avatarUrl String?
-  pin       String?  // Simple PIN for profile switching
+  pin       String?
   role      Role     @default(USER)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -53,8 +54,7 @@ model Profile {
   sensoryMode  SensoryMode  @default(LOW_STIMULATION)
   rewardType   RewardType   @default(POINTS)
 
-  // Calendar integration
-  calendarToken String?  @unique // Secret token for iCal subscription URL
+  calendarToken String?  @unique
 
   // Relations
   activities   Activity[]
@@ -63,8 +63,6 @@ model Profile {
   earnedPoints EarnedPoint[]
   badges       Badge[]
   earnedBadges EarnedBadge[]
-  todos        Todo[]
-  kanbanBoards KanbanBoard[]
   uploadedSignVideos SignVideo[] @relation("UploadedSignVideos")
   favoriteSymbols  FavoriteSymbol[]
 }
@@ -92,42 +90,45 @@ enum RewardType {
   BADGES
 }
 
-// ─── Scheduling ────────────────────────────────────────────────────────
+// ─── Unified Task / Activity ───────────────────────────────────────────
 
 model Activity {
-  id          String    @id @default(cuid())
+  id          String      @id @default(cuid())
   title       String
   description String?
-  color       String?   // Hex color for the activity block
-  startTime   DateTime
-  endTime     DateTime
-  allDay      Boolean   @default(false)
-  completed   Boolean   @default(false)
-  sortOrder   Int       @default(0)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  color       String?
+  startTime   DateTime?
+  endTime     DateTime?
+  allDay      Boolean     @default(false)
+  status      TaskStatus  @default(BACKLOG)
+  sortOrder   Int         @default(0)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
 
-  // Recurrence
   recurrence  Recurrence?
 
   profileId String
   profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
 
-  // Visual support
   symbolId String?
   symbol   Symbol? @relation(fields: [symbolId], references: [id])
-  imageUrl String? // Custom uploaded image
+  imageUrl String?
 
-  // Sign language support
   signVideoId String?
   signVideo   SignVideo? @relation(fields: [signVideoId], references: [id])
 
-  // Rewards
   pointValue  Int     @default(0)
   earnedPoints EarnedPoint[]
 
-  // Kanban link
-  kanbanCard  KanbanCard?
+  kanbanColumnId String?
+  kanbanColumn   KanbanColumn? @relation(fields: [kanbanColumnId], references: [id], onDelete: SetNull)
+}
+
+enum TaskStatus {
+  BACKLOG
+  TODO
+  IN_PROGRESS
+  DONE
 }
 
 enum Recurrence {
@@ -140,16 +141,14 @@ enum Recurrence {
 // ─── Visual Support (PECS & Teckenstöd) ───────────────────────────────
 
 model Symbol {
-  id       String     @id @default(cuid())
+  id       String       @id @default(cuid())
   name     String
   imageUrl String
-  category String     // e.g. "food", "activity", "emotion"
+  category String
   source   SymbolSource @default(MULBERRY)
 
   activities      Activity[]
-  kanbanCards     KanbanCard[]
   favoriteSymbols FavoriteSymbol[]
-  todos           Todo[]
 }
 
 enum SymbolSource {
@@ -171,15 +170,14 @@ model FavoriteSymbol {
 }
 
 model SignVideo {
-  id          String    @id @default(cuid())
-  word        String    // The Swedish word this sign represents
-  videoUrl    String    // URL to the video file
-  thumbnailUrl String?  // Optional thumbnail image
-  category    String    // e.g. "mat", "aktivitet", "känsla", "tid"
-  source      SignVideoSource @default(BUILTIN)
-  createdAt   DateTime  @default(now())
+  id           String          @id @default(cuid())
+  word         String
+  videoUrl     String
+  thumbnailUrl String?
+  category     String
+  source       SignVideoSource @default(BUILTIN)
+  createdAt    DateTime        @default(now())
 
-  // Who uploaded (null for built-in library)
   uploadedById String?
   uploadedBy   Profile? @relation("UploadedSignVideos", fields: [uploadedById], references: [id], onDelete: SetNull)
 
@@ -194,11 +192,11 @@ enum SignVideoSource {
 // ─── Reward System ─────────────────────────────────────────────────────
 
 model Reward {
-  id          String @id @default(cuid())
+  id          String   @id @default(cuid())
   name        String
   description String?
   iconUrl     String?
-  cost        Int    // Points/tokens needed to redeem
+  cost        Int
   createdAt   DateTime @default(now())
 
   profileId String
@@ -230,17 +228,14 @@ model EarnedPoint {
 
   activityId String?
   activity   Activity? @relation(fields: [activityId], references: [id], onDelete: SetNull)
-
-  todoId String?
-  todo   Todo? @relation(fields: [todoId], references: [id], onDelete: SetNull)
 }
 
 model Badge {
-  id          String @id @default(cuid())
+  id          String   @id @default(cuid())
   name        String
   description String?
   iconUrl     String?
-  criteria    String // e.g. "streak:7", "total:100", "daily:5"
+  criteria    String
   createdAt   DateTime @default(now())
 
   profileId String
@@ -250,8 +245,8 @@ model Badge {
 }
 
 model EarnedBadge {
-  id        String   @id @default(cuid())
-  earnedAt  DateTime @default(now())
+  id       String   @id @default(cuid())
+  earnedAt DateTime @default(now())
 
   profileId String
   profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
@@ -277,28 +272,6 @@ model Theme {
   profiles Profile[]
 }
 
-// ─── Todos ─────────────────────────────────────────────────────────────
-
-model Todo {
-  id          String   @id @default(cuid())
-  title       String
-  completed   Boolean  @default(false)
-  sortOrder   Int      @default(0)
-  pointValue  Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  // Visual support
-  symbolId String?
-  symbol   Symbol? @relation(fields: [symbolId], references: [id])
-
-  profileId String
-  profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
-
-  // Reward tracking
-  earnedPoints EarnedPoint[]
-}
-
 // ─── Kanban ────────────────────────────────────────────────────────────
 
 model KanbanBoard {
@@ -307,8 +280,8 @@ model KanbanBoard {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  profileId String
-  profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  householdId String
+  household   Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
 
   columns KanbanColumn[]
 }
@@ -322,27 +295,5 @@ model KanbanColumn {
   boardId String
   board   KanbanBoard @relation(fields: [boardId], references: [id], onDelete: Cascade)
 
-  cards KanbanCard[]
-}
-
-model KanbanCard {
-  id          String   @id @default(cuid())
-  title       String
-  description String?
-  color       String?
-  sortOrder   Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  columnId String
-  column   KanbanColumn @relation(fields: [columnId], references: [id], onDelete: Cascade)
-
-  // Optional link to a scheduled activity
-  activityId String?   @unique
-  activity   Activity? @relation(fields: [activityId], references: [id], onDelete: SetNull)
-
-  // Visual support
-  symbolId String?
-  symbol   Symbol? @relation(fields: [symbolId], references: [id])
-  imageUrl String?
+  activities Activity[]
 }

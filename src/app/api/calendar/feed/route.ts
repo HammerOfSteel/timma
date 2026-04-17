@@ -32,8 +32,8 @@ export async function GET(request: NextRequest) {
   const activities = await prisma.activity.findMany({
     where: {
       profileId: profile.id,
-      startTime: { gte: from },
-      endTime: { lte: to },
+      startTime: { not: null, gte: from },
+      endTime: { not: null, lte: to },
     },
     orderBy: { startTime: 'asc' },
   });

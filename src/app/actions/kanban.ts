@@ -5,17 +5,19 @@ import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/db';
 import { getSession } from '@/lib/session';
 
-export async function getKanbanBoard(profileId: string) {
-  // Get the profile's board (create default if none exists)
+export async function getKanbanBoard(householdId: string) {
   let board = await prisma.kanbanBoard.findFirst({
-    where: { profileId },
+    where: { householdId },
     include: {
       columns: {
         orderBy: { sortOrder: 'asc' },
         include: {
-          cards: {
+          activities: {
             orderBy: { sortOrder: 'asc' },
-            include: { symbol: true, activity: true },
+            include: {
+              symbol: true,
+              profile: { select: { id: true, name: true } },
+            },
           },
         },
       },
@@ -25,8 +27,8 @@ export async function getKanbanBoard(profileId: string) {
   if (!board) {
     board = await prisma.kanbanBoard.create({
       data: {
-        name: 'Min tavla',
-        profileId,
+        name: 'Familjens tavla',
+        householdId,
         columns: {
           create: [
             { title: 'Att göra', sortOrder: 0, color: '#6366f1' },
@@ -39,9 +41,12 @@ export async function getKanbanBoard(profileId: string) {
         columns: {
           orderBy: { sortOrder: 'asc' },
           include: {
-            cards: {
+            activities: {
               orderBy: { sortOrder: 'asc' },
-              include: { symbol: true, activity: true },
+              include: {
+                symbol: true,
+                profile: { select: { id: true, name: true } },
+              },
             },
           },
         },
@@ -52,7 +57,7 @@ export async function getKanbanBoard(profileId: string) {
   return board;
 }
 
-export async function createKanbanCard(formData: FormData) {
+export async function addTaskToKanbanColumn(formData: FormData) {
   const session = await getSession();
   if (!session?.activeProfileId) redirect('/login');
 
@@ -60,146 +65,130 @@ export async function createKanbanCard(formData: FormData) {
   const title = formData.get('title') as string;
   const description = (formData.get('description') as string) || null;
   const color = (formData.get('color') as string) || null;
+  const assignToProfileId = (formData.get('assignToProfileId') as string) || session.activeProfileId;
 
-  if (!columnId || !title) {
-    return { error: 'Kolumn och titel krävs.' };
-  }
+  if (!columnId || !title) return { error: 'Kolumn och titel krävs.' };
 
-  // Verify column belongs to the user's board
   const column = await prisma.kanbanColumn.findFirst({
-    where: { id: columnId, board: { profileId: session.activeProfileId } },
+    where: { id: columnId, board: { householdId: session.householdId } },
   });
   if (!column) return { error: 'Kolumnen hittades inte.' };
-
-  const maxSort = await prisma.kanbanCard.aggregate({
-    where: { columnId },
-    _max: { sortOrder: true },
-  });
 
   // Handle symbol
   const symbolFile = (formData.get('symbolFile') as string) || null;
   const symbolName = (formData.get('symbolName') as string) || null;
   let symbolId: string | null = null;
-
   if (symbolFile && symbolName) {
     let symbol = await prisma.symbol.findFirst({
       where: { imageUrl: `/symbols/mulberry/${symbolFile}`, source: 'MULBERRY' },
     });
     if (!symbol) {
       symbol = await prisma.symbol.create({
-        data: {
-          name: symbolName,
-          imageUrl: `/symbols/mulberry/${symbolFile}`,
-          category: 'mulberry',
-          source: 'MULBERRY',
-        },
+        data: { name: symbolName, imageUrl: `/symbols/mulberry/${symbolFile}`, category: 'mulberry', source: 'MULBERRY' },
       });
     }
     symbolId = symbol.id;
   }
 
-  await prisma.kanbanCard.create({
+  const maxSort = await prisma.activity.aggregate({
+    where: { kanbanColumnId: columnId },
+    _max: { sortOrder: true },
+  });
+
+  await prisma.activity.create({
     data: {
       title,
       description,
       color,
       sortOrder: (maxSort._max.sortOrder ?? 0) + 1,
-      columnId,
+      profileId: assignToProfileId,
+      kanbanColumnId: columnId,
       symbolId,
+      status: 'TODO',
     },
   });
 
   revalidatePath('/kanban');
+  revalidatePath('/todos');
 }
 
-export async function updateKanbanCard(cardId: string, formData: FormData) {
+export async function moveActivityToColumn(activityId: string, targetColumnId: string, newSortOrder: number) {
   const session = await getSession();
-  if (!session?.activeProfileId) redirect('/login');
+  if (!session) redirect('/login');
 
-  const card = await prisma.kanbanCard.findFirst({
-    where: { id: cardId, column: { board: { profileId: session.activeProfileId } } },
+  const activity = await prisma.activity.findFirst({
+    where: { id: activityId, profile: { householdId: session.householdId } },
   });
-  if (!card) return { error: 'Kortet hittades inte.' };
-
-  const title = formData.get('title') as string;
-  const description = (formData.get('description') as string) || null;
-  const color = (formData.get('color') as string) || card.color;
-
-  await prisma.kanbanCard.update({
-    where: { id: cardId },
-    data: { title, description, color },
-  });
-
-  revalidatePath('/kanban');
-}
-
-export async function deleteKanbanCard(cardId: string) {
-  const session = await getSession();
-  if (!session?.activeProfileId) redirect('/login');
-
-  await prisma.kanbanCard.deleteMany({
-    where: { id: cardId, column: { board: { profileId: session.activeProfileId } } },
-  });
-
-  revalidatePath('/kanban');
-}
-
-export async function moveKanbanCard(
-  cardId: string,
-  targetColumnId: string,
-  newSortOrder: number,
-) {
-  const session = await getSession();
-  if (!session?.activeProfileId) redirect('/login');
-
-  // Verify card and target column belong to user
-  const card = await prisma.kanbanCard.findFirst({
-    where: { id: cardId, column: { board: { profileId: session.activeProfileId } } },
-  });
-  if (!card) return;
+  if (!activity) return;
 
   const targetColumn = await prisma.kanbanColumn.findFirst({
-    where: { id: targetColumnId, board: { profileId: session.activeProfileId } },
+    where: { id: targetColumnId, board: { householdId: session.householdId } },
   });
   if (!targetColumn) return;
 
-  // Shift existing cards in target column to make room
-  await prisma.kanbanCard.updateMany({
-    where: { columnId: targetColumnId, sortOrder: { gte: newSortOrder } },
+  // Shift existing activities in target column
+  await prisma.activity.updateMany({
+    where: { kanbanColumnId: targetColumnId, sortOrder: { gte: newSortOrder } },
     data: { sortOrder: { increment: 1 } },
   });
 
-  // Move the card
-  await prisma.kanbanCard.update({
-    where: { id: cardId },
-    data: { columnId: targetColumnId, sortOrder: newSortOrder },
+  // Determine status based on column position
+  const board = await prisma.kanbanBoard.findFirst({
+    where: { householdId: session.householdId },
+    include: { columns: { orderBy: { sortOrder: 'asc' } } },
+  });
+  const colIndex = board?.columns.findIndex((c) => c.id === targetColumnId) ?? 0;
+  const totalCols = board?.columns.length ?? 3;
+  let newStatus = 'TODO';
+  if (colIndex === totalCols - 1) newStatus = 'DONE';
+  else if (colIndex > 0) newStatus = 'IN_PROGRESS';
+
+  await prisma.activity.update({
+    where: { id: activityId },
+    data: { kanbanColumnId: targetColumnId, sortOrder: newSortOrder, status: newStatus as any },
+  });
+
+  // Handle points for DONE
+  if (activity.pointValue > 0) {
+    if (newStatus === 'DONE' && activity.status !== 'DONE') {
+      await prisma.earnedPoint.create({
+        data: {
+          amount: activity.pointValue,
+          reason: `Klar: ${activity.title}`,
+          profileId: activity.profileId,
+          activityId: activity.id,
+        },
+      });
+    } else if (newStatus !== 'DONE' && activity.status === 'DONE') {
+      await prisma.earnedPoint.deleteMany({
+        where: { profileId: activity.profileId, activityId: activity.id },
+      });
+    }
+  }
+
+  revalidatePath('/kanban');
+  revalidatePath('/todos');
+  revalidatePath('/');
+}
+
+export async function deleteKanbanActivity(activityId: string) {
+  const session = await getSession();
+  if (!session) redirect('/login');
+
+  await prisma.activity.deleteMany({
+    where: { id: activityId, profile: { householdId: session.householdId } },
   });
 
   revalidatePath('/kanban');
-}
-
-export async function reorderKanbanCards(columnId: string, orderedCardIds: string[]) {
-  const session = await getSession();
-  if (!session?.activeProfileId) redirect('/login');
-
-  await prisma.$transaction(
-    orderedCardIds.map((id, index) =>
-      prisma.kanbanCard.updateMany({
-        where: { id, column: { id: columnId, board: { profileId: session.activeProfileId! } } },
-        data: { sortOrder: index },
-      }),
-    ),
-  );
-
-  revalidatePath('/kanban');
+  revalidatePath('/todos');
 }
 
 export async function createKanbanColumn(boardId: string, title: string) {
   const session = await getSession();
-  if (!session?.activeProfileId) redirect('/login');
+  if (!session) redirect('/login');
 
   const board = await prisma.kanbanBoard.findFirst({
-    where: { id: boardId, profileId: session.activeProfileId },
+    where: { id: boardId, householdId: session.householdId },
   });
   if (!board) return { error: 'Tavlan hittades inte.' };
 
@@ -209,23 +198,7 @@ export async function createKanbanColumn(boardId: string, title: string) {
   });
 
   await prisma.kanbanColumn.create({
-    data: {
-      title,
-      sortOrder: (maxSort._max.sortOrder ?? 0) + 1,
-      boardId,
-    },
-  });
-
-  revalidatePath('/kanban');
-}
-
-export async function updateKanbanColumn(columnId: string, title: string, color: string) {
-  const session = await getSession();
-  if (!session?.activeProfileId) redirect('/login');
-
-  await prisma.kanbanColumn.updateMany({
-    where: { id: columnId, board: { profileId: session.activeProfileId } },
-    data: { title, color },
+    data: { title, sortOrder: (maxSort._max.sortOrder ?? 0) + 1, boardId },
   });
 
   revalidatePath('/kanban');
@@ -233,35 +206,16 @@ export async function updateKanbanColumn(columnId: string, title: string, color:
 
 export async function deleteKanbanColumn(columnId: string) {
   const session = await getSession();
-  if (!session?.activeProfileId) redirect('/login');
+  if (!session) redirect('/login');
 
-  // Only delete if it belongs to the user's board
+  // Unlink activities from column before deleting
+  await prisma.activity.updateMany({
+    where: { kanbanColumnId: columnId },
+    data: { kanbanColumnId: null },
+  });
+
   await prisma.kanbanColumn.deleteMany({
-    where: { id: columnId, board: { profileId: session.activeProfileId } },
-  });
-
-  revalidatePath('/kanban');
-}
-
-export async function linkCardToActivity(cardId: string, activityId: string | null) {
-  const session = await getSession();
-  if (!session?.activeProfileId) redirect('/login');
-
-  const card = await prisma.kanbanCard.findFirst({
-    where: { id: cardId, column: { board: { profileId: session.activeProfileId } } },
-  });
-  if (!card) return { error: 'Kortet hittades inte.' };
-
-  if (activityId) {
-    const activity = await prisma.activity.findFirst({
-      where: { id: activityId, profileId: session.activeProfileId },
-    });
-    if (!activity) return { error: 'Aktiviteten hittades inte.' };
-  }
-
-  await prisma.kanbanCard.update({
-    where: { id: cardId },
-    data: { activityId },
+    where: { id: columnId, board: { householdId: session.householdId } },
   });
 
   revalidatePath('/kanban');

@@ -1831,16 +1831,30 @@ This is generally NOT safe. Learn more at https://bit.ly/wb-precache`);
   ];
   new eS({
     precacheEntries: [
-      { revision: null, url: '/_next/static/chunks/437-0ce879aa1f584405.js' },
+      {
+        revision: '9851a31dcdb684eaf6fa3fd3df8d8c88',
+        url: '/_next/static/7VqrApQIm1MFl_v_xvMkJ/_buildManifest.js',
+      },
+      {
+        revision: 'b6652df95db52feb4daf4eca35380933',
+        url: '/_next/static/7VqrApQIm1MFl_v_xvMkJ/_ssgManifest.js',
+      },
       { revision: null, url: '/_next/static/chunks/4bd1b696-215e5051988c3dde.js' },
+      { revision: null, url: '/_next/static/chunks/500-c99b8dfd3de17c86.js' },
       { revision: null, url: '/_next/static/chunks/511-49961ea3eec20a0a.js' },
+      { revision: null, url: '/_next/static/chunks/app/(auth)/login/page-739ceeb9283696e5.js' },
+      {
+        revision: null,
+        url: '/_next/static/chunks/app/(auth)/profile-select/page-ac9a2144acbd9e25.js',
+      },
+      { revision: null, url: '/_next/static/chunks/app/(auth)/signup/page-c4fad4c92ea35b2f.js' },
       { revision: null, url: '/_next/static/chunks/app/_global-error/page-7cf2a28a84157523.js' },
       { revision: null, url: '/_next/static/chunks/app/_not-found/page-9a9cfe1efa208813.js' },
-      { revision: null, url: '/_next/static/chunks/app/layout-3630dfd32bb8a1b9.js' },
-      { revision: null, url: '/_next/static/chunks/app/page-f8dd847879afa3b4.js' },
+      { revision: null, url: '/_next/static/chunks/app/layout-38a7c8b63906c263.js' },
+      { revision: null, url: '/_next/static/chunks/app/page-c111a05fba76225b.js' },
       { revision: null, url: '/_next/static/chunks/framework-93cda6578f6c76ec.js' },
-      { revision: null, url: '/_next/static/chunks/main-966e37a8e3601ed8.js' },
       { revision: null, url: '/_next/static/chunks/main-app-ee835abc931bce1e.js' },
+      { revision: null, url: '/_next/static/chunks/main-e6c28e97220a61f9.js' },
       {
         revision: null,
         url: '/_next/static/chunks/next/dist/client/components/builtin/app-error-7cf2a28a84157523.js',
@@ -1865,16 +1879,8 @@ This is generally NOT safe. Learn more at https://bit.ly/wb-precache`);
         revision: '846118c33b2c0e922d7b3a7676f81f6f',
         url: '/_next/static/chunks/polyfills-42372ed130431b0a.js',
       },
-      { revision: null, url: '/_next/static/chunks/webpack-046cacf2834edd2b.js' },
-      { revision: null, url: '/_next/static/css/f277fd472ca42691.css' },
-      {
-        revision: '2f9b2887c42fd51ca239efcc64650c47',
-        url: '/_next/static/eLTxEhdunLOk1m-lLrtV_/_buildManifest.js',
-      },
-      {
-        revision: 'b6652df95db52feb4daf4eca35380933',
-        url: '/_next/static/eLTxEhdunLOk1m-lLrtV_/_ssgManifest.js',
-      },
+      { revision: null, url: '/_next/static/chunks/webpack-c4e984e704471c9f.js' },
+      { revision: null, url: '/_next/static/css/89917a3104c447d4.css' },
       {
         revision: '18bae71b1e1b2bb25321090a3b563103',
         url: '/_next/static/media/4cf2300e9c8272f7-s.p.woff2',

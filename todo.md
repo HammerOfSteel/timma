@@ -6,14 +6,14 @@ The minimum viable product — a functional day planner with visual support that
 
 ### 1.1 Project Setup
 
-- [ ] Initialize Next.js project with TypeScript
-- [ ] Configure Tailwind CSS (or chosen styling solution)
-- [ ] Set up ESLint + Prettier
-- [ ] Configure PWA (next-pwa / Serwist) with service worker
-- [ ] Set up Docker Compose (Next.js app + PostgreSQL)
-- [ ] Set up Prisma ORM with PostgreSQL
-- [ ] Define initial database schema (users, profiles, schedules, activities)
-- [ ] Seed script with sample data
+- [x] Initialize Next.js project with TypeScript
+- [x] Configure Tailwind CSS (or chosen styling solution)
+- [x] Set up ESLint + Prettier
+- [x] Configure PWA (next-pwa / Serwist) with service worker
+- [x] Set up Docker Compose (Next.js app + PostgreSQL)
+- [x] Set up Prisma ORM with PostgreSQL
+- [x] Define initial database schema (users, profiles, schedules, activities)
+- [x] Seed script with sample data
 
 ### 1.2 Authentication & User Model
 

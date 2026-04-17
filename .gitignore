@@ -42,3 +42,10 @@ yarn-error.log*
 next-env.d.ts
 
 /src/generated/prisma
+
+# Mulberry Symbols (download via: npx tsx scripts/setup-symbols.ts)
+/public/symbols/mulberry/
+/tmp/
+
+# Uploaded images
+/public/uploads/

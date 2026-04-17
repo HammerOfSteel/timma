@@ -26,20 +26,20 @@ The minimum viable product — a functional day planner with visual support that
 
 ### 1.3 Day Planner / Schedule View
 
-- [ ] Daily schedule view — default block-based layout
-- [ ] Add / edit / delete activities (caregiver)
+- [x] Daily schedule view — default block-based layout
+- [x] Add / edit / delete activities (caregiver)
 - [ ] Drag-and-drop reordering
-- [ ] Activity cards with title, time, icon/image, and color
-- [ ] "Now → Next → Later" card strip view
-- [ ] Traditional timeline view (optional per user)
-- [ ] Configurable view mode per user profile (caregiver setting)
+- [x] Activity cards with title, time, icon/image, and color
+- [x] "Now → Next → Later" card strip view
+- [x] Traditional timeline view (optional per user)
+- [x] Configurable view mode per user profile (caregiver setting)
 
 ### 1.4 PECS & Visual Support (Basic)
 
-- [ ] Integrate open-source symbol library (Mulberry Symbols)
-- [ ] Symbol picker when creating/editing activities
-- [ ] Custom image upload per activity
-- [ ] Display symbols on schedule cards
+- [x] Integrate open-source symbol library (Mulberry Symbols)
+- [x] Symbol picker when creating/editing activities
+- [x] Custom image upload per activity
+- [x] Display symbols on schedule cards
 
 ### 1.5 Basic Themes
 

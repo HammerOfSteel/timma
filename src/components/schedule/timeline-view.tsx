@@ -1,6 +1,7 @@
 'use client';
 
 import type { ScheduleViewProps } from './types';
+import { ActivityVisual } from './activity-visual';
 
 function formatTime(iso: string) {
   const d = new Date(iso);
@@ -113,6 +114,11 @@ export function TimelineView({
                           </svg>
                         )}
                       </button>
+                      <ActivityVisual
+                        symbol={activity.symbol}
+                        imageUrl={activity.imageUrl}
+                        size="sm"
+                      />
                       <span
                         className={`truncate text-sm font-semibold ${activity.completed ? 'line-through text-gray-400' : ''}`}
                       >

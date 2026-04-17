@@ -49,6 +49,28 @@ export async function createActivity(formData: FormData) {
     return { error: 'Sluttid måste vara efter starttid.' };
   }
 
+  // Handle symbol
+  const symbolFile = (formData.get('symbolFile') as string) || null;
+  const symbolName = (formData.get('symbolName') as string) || null;
+  let symbolId: string | null = null;
+
+  if (symbolFile && symbolName) {
+    let symbol = await prisma.symbol.findFirst({
+      where: { imageUrl: `/symbols/mulberry/${symbolFile}`, source: 'MULBERRY' },
+    });
+    if (!symbol) {
+      symbol = await prisma.symbol.create({
+        data: {
+          name: symbolName,
+          imageUrl: `/symbols/mulberry/${symbolFile}`,
+          category: 'mulberry',
+          source: 'MULBERRY',
+        },
+      });
+    }
+    symbolId = symbol.id;
+  }
+
   const maxSort = await prisma.activity.aggregate({
     where: { profileId: session.activeProfileId },
     _max: { sortOrder: true },
@@ -64,6 +86,7 @@ export async function createActivity(formData: FormData) {
       pointValue,
       sortOrder: (maxSort._max.sortOrder ?? 0) + 1,
       profileId: session.activeProfileId,
+      symbolId,
     },
   });
 
@@ -94,9 +117,51 @@ export async function updateActivity(activityId: string, formData: FormData) {
   const endTime = new Date(date);
   endTime.setHours(endHour, endMinute, 0, 0);
 
+  // Handle symbol
+  const symbolFile = (formData.get('symbolFile') as string) || null;
+  const symbolName = (formData.get('symbolName') as string) || null;
+  const removeSymbol = formData.get('removeSymbol') === 'true';
+  let symbolId: string | undefined = undefined;
+
+  if (removeSymbol) {
+    symbolId = null as unknown as undefined;
+    // Using raw update for null
+    await prisma.activity.update({
+      where: { id: activityId },
+      data: { title, description, color, startTime, endTime, pointValue, symbolId: null },
+    });
+    revalidatePath('/');
+    return;
+  }
+
+  if (symbolFile && symbolName) {
+    let symbol = await prisma.symbol.findFirst({
+      where: { imageUrl: `/symbols/mulberry/${symbolFile}`, source: 'MULBERRY' },
+    });
+    if (!symbol) {
+      symbol = await prisma.symbol.create({
+        data: {
+          name: symbolName,
+          imageUrl: `/symbols/mulberry/${symbolFile}`,
+          category: 'mulberry',
+          source: 'MULBERRY',
+        },
+      });
+    }
+    symbolId = symbol.id;
+  }
+
   await prisma.activity.update({
     where: { id: activityId },
-    data: { title, description, color, startTime, endTime, pointValue },
+    data: {
+      title,
+      description,
+      color,
+      startTime,
+      endTime,
+      pointValue,
+      ...(symbolId !== undefined ? { symbolId } : {}),
+    },
   });
 
   revalidatePath('/');

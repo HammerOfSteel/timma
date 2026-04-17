@@ -1,0 +1,402 @@
+{
+  "version": "v3.5.2",
+  "totalSymbols": 3436,
+  "categories": {
+    "aimant": [
+      {
+        "id": "1878",
+        "name": "Science",
+        "file": "Science.svg",
+        "category": "aimant",
+        "tags": ["magnet"]
+      }
+    ],
+    "argent": [
+      {
+        "id": "1972",
+        "name": "Money",
+        "file": "Money.svg",
+        "category": "argent",
+        "tags": ["money"]
+      }
+    ],
+    "argile": [
+      {
+        "id": "510",
+        "name": "Science",
+        "file": "Science.svg",
+        "category": "argile",
+        "tags": ["clay"]
+      }
+    ],
+    "atome": [
+      {
+        "id": "68",
+        "name": "Science",
+        "file": "Science.svg",
+        "category": "atome",
+        "tags": ["atom"]
+      }
+    ],
+    "bandé": [
+      {
+        "id": "165",
+        "name": "Science",
+        "file": "Science.svg",
+        "category": "bandé",
+        "tags": ["bendy"]
+      }
+    ],
+    "banque": [
+      {
+        "id": "111",
+        "name": "Money",
+        "file": "Money.svg",
+        "category": "banque",
+        "tags": ["bank"]
+      }
+    ],
+    "beaker_1": [
+      {
+        "id": "142",
+        "name": "Science",
+        "file": "Science.svg",
+        "category": "beaker_1",
+        "tags": ["beaker_1"]
+      }
+    ],
+    "beaker_2": [
+      {
+        "id": "143",
+        "name": "Science",
+        "file": "Science.svg",
+        "category": "beaker_2",
+        "tags": ["beaker_2"]
+      }
+    ],
+    "bendy_1": [
+      {
+        "id": "166",
+        "name": "Science",
+        "file": "Science.svg",
+        "category": "bendy_1",
+        "tags": ["bendy_1"]
+      }
+    ],
+    "Carnet de chèque": [
+      {
+        "id": "449",
+        "name": "Money",
+        "file": "Money.svg",
+        "category": "Carnet de chèque",
+        "tags": ["cheque_book"]
+      }
+    ],
+    "carte bancaire": [
+      {
+        "id": "112",
+        "name": "Money",
+        "file": "Money.svg",
+        "category": "carte bancaire",
+        "tags": ["bank_card"]
+      }
+    ],
+    "cash_point": [
+      {
+        "id": "391",
+        "name": "Money",
+        "file": "Money.svg",
+        "category": "cash_point",
+        "tags": ["cash_point"]
+      }
+    ],
+    "chip_and_pin_device": [
+      {
+        "id": "474",
+        "name": "Money",
+        "file": "Money.svg",
+        "category": "chip_and_pin_device",
+        "tags": ["chip_and_pin_device"]
+      }
+    ],
+    "compteurs": [
+      {
+        "id": "615",
+        "name": "Money",
+        "file": "Money.svg",
+        "category": "compteurs",
+        "tags": ["counters"]
+      }
+    ],
+    "couche d'ozone": [
+      {
+        "id": "2111",
+        "name": "Science",
+        "file": "Science.svg",
+        "category": "couche d'ozone",
+        "tags": ["ozone_layer"]
+      }
+    ],
+    "Croûte terrestre": [
+      {
+        "id": "995",
+        "name": "Science",
+        "file": "Science.svg",
+        "category": "Croûte terrestre",
+        "tags": ["Earth_crust"]
+      }
+    ],
+    "dropper_pipette": [
+      {
+        "id": "972",
+        "name": "Science",
+        "file": "Science.svg",
+        "category": "dropper_pipette",
+        "tags": ["dropper_pipette"]
+      }
+    ],
+    "Earth_inner_core": [
+      {
+        "id": "996",
+        "name": "Science",
+        "file": "Science.svg",
+        "category": "Earth_inner_core",
+        "tags": ["Earth_inner_core"]
+      }
+    ],
+    "Earth_mantle": [
+      {
+        "id": "997",
+        "name": "Science",
+        "file": "Science.svg",
+        "category": "Earth_mantle",
+        "tags": ["Earth_mantle"]
+      }
+    ],
+    "Earth_outer_core": [
+      {
+        "id": "998",
+        "name": "Science",
+        "file": "Science.svg",
+        "category": "Earth_outer_core",
+        "tags": ["Earth_outer_core"]
+      }
+    ],
+    "en tissu": [
+      {
+        "id": "1066",
+        "name": "Science",
+        "file": "Science.svg",
+        "category": "en tissu",
+        "tags": ["fabric"]
+      }
+    ],
+    "étoile filante": [
+      {
+        "id": "2547",
+        "name": "Science",
+        "file": "Science.svg",
+        "category": "étoile filante",
+        "tags": ["shooting_star"]
+      }
+    ],
+    "flotte": [
+      {
+        "id": "1402",
+        "name": "Science",
+        "file": "Science.svg",
+        "category": "flotte",
+        "tags": ["float"]
+      }
+    ],
+    "friction": [
+      {
+        "id": "1483",
+        "name": "Science",
+        "file": "Science.svg",
+        "category": "friction",
+        "tags": ["friction"]
+      }
+    ],
+    "imperméable": [
+      {
+        "id": "3030",
+        "name": "Science",
+        "file": "Science.svg",
+        "category": "imperméable",
+        "tags": ["waterproof"]
+      }
+    ],
+    "la gravité": [
+      {
+        "id": "1557",
+        "name": "Science",
+        "file": "Science.svg",
+        "category": "la gravité",
+        "tags": ["gravity"]
+      }
+    ],
+    "lentille": [
+      {
+        "id": "1823",
+        "name": "Science",
+        "file": "Science.svg",
+        "category": "lentille",
+        "tags": ["lens"]
+      }
+    ],
+    "lingot d'or": [
+      {
+        "id": "1531",
+        "name": "Money",
+        "file": "Money.svg",
+        "category": "lingot d'or",
+        "tags": ["gold_bar"]
+      }
+    ],
+    "lisse": [
+      {
+        "id": "2604",
+        "name": "Science",
+        "file": "Science.svg",
+        "category": "lisse",
+        "tags": ["smooth"]
+      }
+    ],
+    "magnétique": [
+      {
+        "id": "1879",
+        "name": "Science",
+        "file": "Science.svg",
+        "category": "magnétique",
+        "tags": ["magnetic"]
+      }
+    ],
+    "microscope": [
+      {
+        "id": "1932",
+        "name": "Science",
+        "file": "Science.svg",
+        "category": "microscope",
+        "tags": ["microscope"]
+      }
+    ],
+    "opaque": [
+      {
+        "id": "2088",
+        "name": "Science",
+        "file": "Science.svg",
+        "category": "opaque",
+        "tags": ["opaque"]
+      }
+    ],
+    "papier filtre": [
+      {
+        "id": "1106",
+        "name": "Science",
+        "file": "Science.svg",
+        "category": "papier filtre",
+        "tags": ["filter_paper"]
+      }
+    ],
+    "pâte à modeler": [
+      {
+        "id": "2255",
+        "name": "Science",
+        "file": "Science.svg",
+        "category": "pâte à modeler",
+        "tags": ["playdough"]
+      }
+    ],
+    "Plastique": [
+      {
+        "id": "2248",
+        "name": "Science",
+        "file": "Science.svg",
+        "category": "Plastique",
+        "tags": ["plastic"]
+      }
+    ],
+    "poterie": [
+      {
+        "id": "2302",
+        "name": "Science",
+        "file": "Science.svg",
+        "category": "poterie",
+        "tags": ["pottery"]
+      }
+    ],
+    "sac plastique": [
+      {
+        "id": "2249",
+        "name": "Science",
+        "file": "Science.svg",
+        "category": "sac plastique",
+        "tags": ["plastic_bag"]
+      }
+    ],
+    "silence": [
+      {
+        "id": "2569",
+        "name": "Science",
+        "file": "Science.svg",
+        "category": "silence",
+        "tags": ["silence"]
+      }
+    ],
+    "thermometer_2": [
+      {
+        "id": "2822",
+        "name": "Science",
+        "file": "Science.svg",
+        "category": "thermometer_2",
+        "tags": ["thermometer_2"]
+      }
+    ],
+    "transparent": [
+      {
+        "id": "2910",
+        "name": "Science",
+        "file": "Science.svg",
+        "category": "transparent",
+        "tags": ["transparent"]
+      }
+    ],
+    "trépied": [
+      {
+        "id": "2925",
+        "name": "Science",
+        "file": "Science.svg",
+        "category": "trépied",
+        "tags": ["tripod"]
+      }
+    ],
+    "tube à essai": [
+      {
+        "id": "2817",
+        "name": "Science",
+        "file": "Science.svg",
+        "category": "tube à essai",
+        "tags": ["test_tube"]
+      }
+    ],
+    "verre": [
+      {
+        "id": "1520",
+        "name": "Science",
+        "file": "Science.svg",
+        "category": "verre",
+        "tags": ["glass"]
+      }
+    ],
+    "verre _, _ boire": [
+      {
+        "id": "1521",
+        "name": "Science",
+        "file": "Science.svg",
+        "category": "verre _, _ boire",
+        "tags": ["glass_,_drinking"]
+      }
+    ]
+  }
+}

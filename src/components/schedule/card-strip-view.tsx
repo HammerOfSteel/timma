@@ -1,6 +1,7 @@
 'use client';
 
 import type { ScheduleViewProps } from './types';
+import { ActivityVisual } from './activity-visual';
 
 function formatTime(iso: string) {
   const d = new Date(iso);
@@ -72,15 +73,20 @@ export function CardStripView({
               </span>
 
               <div className="mt-3 flex items-center gap-2">
-                <div
-                  className="h-3 w-3 rounded-full"
-                  style={{ backgroundColor: activity.color || '#6366f1' }}
-                />
-                <h3
-                  className={`text-lg font-bold ${activity.completed ? 'line-through text-gray-400' : ''}`}
-                >
-                  {activity.title}
-                </h3>
+                <ActivityVisual symbol={activity.symbol} imageUrl={activity.imageUrl} size="lg" />
+                <div>
+                  <div className="flex items-center gap-1.5">
+                    <div
+                      className="h-3 w-3 shrink-0 rounded-full"
+                      style={{ backgroundColor: activity.color || '#6366f1' }}
+                    />
+                    <h3
+                      className={`text-lg font-bold ${activity.completed ? 'line-through text-gray-400' : ''}`}
+                    >
+                      {activity.title}
+                    </h3>
+                  </div>
+                </div>
               </div>
 
               <p className="mt-1 text-sm text-gray-500">

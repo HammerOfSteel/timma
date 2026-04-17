@@ -1,6 +1,7 @@
 'use client';
 
 import type { ScheduleViewProps } from './types';
+import { ActivityVisual } from './activity-visual';
 
 function formatTime(iso: string) {
   const d = new Date(iso);
@@ -61,11 +62,11 @@ export function BlockView({ activities, onToggleComplete, onEdit, onDelete }: Sc
                 </button>
                 <div>
                   <div className="flex items-center gap-2">
-                    {activity.symbol && (
-                      <span className="text-lg" title={activity.symbol.name}>
-                        📷
-                      </span>
-                    )}
+                    <ActivityVisual
+                      symbol={activity.symbol}
+                      imageUrl={activity.imageUrl}
+                      size="md"
+                    />
                     <h3
                       className={`font-semibold ${activity.completed ? 'line-through text-gray-400' : ''}`}
                     >

@@ -69,10 +69,10 @@ Building out the full feature set beyond basic scheduling.
 
 ### 2.1 Weekly & Monthly Views
 
-- [ ] Week view (7-day grid or horizontal scroll)
-- [ ] Month view (traditional calendar grid)
-- [ ] Navigation between day / week / month
-- [ ] Recurring activities (daily, weekly, custom)
+- [x] Week view (7-day grid or horizontal scroll)
+- [x] Month view (traditional calendar grid)
+- [x] Navigation between day / week / month
+- [x] Recurring activities (daily, weekly, custom)
 
 ### 2.2 Kanban Board
 

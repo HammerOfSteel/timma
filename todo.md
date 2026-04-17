@@ -83,14 +83,14 @@ Building out the full feature set beyond basic scheduling.
 
 ### 2.3 Reward System (Belöningssystem)
 
-- [ ] Reward mechanic selector per user (points, tokens, stars, badges)
-- [ ] **Points system**: earn points per completed task, configurable per activity
-- [ ] **Token board**: visual token collection, configurable token count → reward
-- [ ] **Star chart**: visual progress bar per day/week
-- [ ] **Badges & streaks**: define achievements, track streaks
-- [ ] Caregiver defines available rewards and thresholds
-- [ ] User-facing reward shop / redemption UI
-- [ ] Reward history & stats
+- [x] Reward mechanic selector per user (points, tokens, stars, badges)
+- [x] **Points system**: earn points per completed task, configurable per activity
+- [x] **Token board**: visual token collection, configurable token count → reward
+- [x] **Star chart**: visual progress bar per day/week
+- [x] **Badges & streaks**: define achievements, track streaks
+- [x] Caregiver defines available rewards and thresholds
+- [x] User-facing reward shop / redemption UI
+- [x] Reward history & stats
 
 ### 2.4 Teckenstöd (Sign Support)
 

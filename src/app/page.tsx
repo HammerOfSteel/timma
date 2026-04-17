@@ -1,14 +1,35 @@
 import { redirect } from 'next/navigation';
 import { getSession } from '@/lib/session';
 import { prisma } from '@/lib/db';
-import { logout } from '@/app/actions/auth';
-import Link from 'next/link';
+import { getActivitiesForRange } from '@/app/actions/activities';
 import { DaySchedule } from '@/components/schedule/day-schedule';
+import { WeekView } from '@/components/schedule/week-view';
+import { MonthView } from '@/components/schedule/month-view';
+import { DateNavigator } from '@/components/schedule/date-navigator';
+import type { ViewMode } from '@/components/schedule/date-navigator';
 import type { ActivityData } from '@/components/schedule/types';
 import { ThemeProvider } from '@/components/theme-provider';
 import { HomeHeader } from '@/components/home-header';
 
-export default async function HomePage() {
+function getMonday(d: Date) {
+  const date = new Date(d);
+  const day = date.getDay();
+  const diff = date.getDate() - day + (day === 0 ? -6 : 1);
+  date.setDate(diff);
+  date.setHours(0, 0, 0, 0);
+  return date;
+}
+
+function toDateStr(d: Date) {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+export default async function HomePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ view?: string; date?: string }>;
+}) {
+  const params = await searchParams;
   const session = await getSession();
   if (!session) redirect('/login');
   if (!session.activeProfileId) redirect('/profile-select');
@@ -28,20 +49,34 @@ export default async function HomePage() {
     orderBy: { name: 'asc' },
   });
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const endOfDay = new Date(today);
-  endOfDay.setHours(23, 59, 59, 999);
+  // Parse view mode and date from search params
+  const view: ViewMode = (['day', 'week', 'month'].includes(params.view || '')
+    ? (params.view as ViewMode)
+    : 'day');
 
-  const activities = await prisma.activity.findMany({
-    where: {
-      profileId: profile.id,
-      startTime: { gte: today },
-      endTime: { lte: endOfDay },
-    },
-    include: { symbol: true },
-    orderBy: [{ sortOrder: 'asc' }, { startTime: 'asc' }],
-  });
+  const selectedDate = params.date ? new Date(params.date + 'T12:00:00') : new Date();
+  const dateStr = toDateStr(selectedDate);
+
+  // Calculate date range based on view
+  let rangeStart: Date;
+  let rangeEnd: Date;
+
+  if (view === 'week') {
+    rangeStart = getMonday(selectedDate);
+    rangeEnd = new Date(rangeStart);
+    rangeEnd.setDate(rangeEnd.getDate() + 6);
+    rangeEnd.setHours(23, 59, 59, 999);
+  } else if (view === 'month') {
+    rangeStart = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
+    rangeEnd = new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, 0, 23, 59, 59, 999);
+  } else {
+    rangeStart = new Date(selectedDate);
+    rangeStart.setHours(0, 0, 0, 0);
+    rangeEnd = new Date(selectedDate);
+    rangeEnd.setHours(23, 59, 59, 999);
+  }
+
+  const activities = await getActivitiesForRange(profile.id, rangeStart, rangeEnd);
 
   // Serialize dates for client components
   const serializedActivities: ActivityData[] = activities.map((a) => ({
@@ -55,10 +90,9 @@ export default async function HomePage() {
     sortOrder: a.sortOrder,
     pointValue: a.pointValue,
     imageUrl: a.imageUrl,
+    recurrence: (a.recurrence as ActivityData['recurrence']) ?? null,
     symbol: a.symbol ? { id: a.symbol.id, name: a.symbol.name, imageUrl: a.symbol.imageUrl } : null,
   }));
-
-  const dateStr = today.toISOString().split('T')[0];
 
   // Determine if theme is dark
   const isDark = profile.theme ? isColorDark(profile.theme.backgroundColor) : false;
@@ -79,6 +113,8 @@ export default async function HomePage() {
       }
     : null;
 
+  const weekStart = view === 'week' ? toDateStr(getMonday(selectedDate)) : dateStr;
+
   return (
     <ThemeProvider theme={themeData}>
       <HomeHeader
@@ -90,12 +126,26 @@ export default async function HomePage() {
         calendarToken={profile.calendarToken}
       />
 
-      <DaySchedule
-        activities={serializedActivities}
-        viewMode={profile.viewMode as 'BLOCKS' | 'CARDS' | 'TIMELINE'}
-        date={dateStr}
-        profileName={profile.name}
-      />
+      <DateNavigator view={view} date={dateStr} />
+
+      {view === 'day' && (
+        <DaySchedule
+          activities={serializedActivities}
+          viewMode={profile.viewMode as 'BLOCKS' | 'CARDS' | 'TIMELINE'}
+          date={dateStr}
+          profileName={profile.name}
+        />
+      )}
+      {view === 'week' && (
+        <WeekView activities={serializedActivities} weekStart={weekStart} />
+      )}
+      {view === 'month' && (
+        <MonthView
+          activities={serializedActivities}
+          year={selectedDate.getFullYear()}
+          month={selectedDate.getMonth()}
+        />
+      )}
     </ThemeProvider>
   );
 }

@@ -81,7 +81,12 @@ export function BlockView({ activities, onToggleComplete, onEdit, onDelete }: Sc
                   )}
                 </div>
               </div>
-              <div className="flex gap-1">
+              <div className="flex items-center gap-1">
+                {activity.recurrence && (
+                  <span className="rounded-full bg-blue-100 px-1.5 py-0.5 text-[10px] font-medium text-blue-600" title="Återkommande">
+                    ↻
+                  </span>
+                )}
                 {activity.pointValue > 0 && (
                   <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700">
                     +{activity.pointValue}p

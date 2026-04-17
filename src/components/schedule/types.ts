@@ -1,3 +1,5 @@
+export type RecurrenceType = 'DAILY' | 'WEEKDAYS' | 'WEEKLY' | 'MONTHLY' | null;
+
 export interface ActivityData {
   id: string;
   title: string;
@@ -9,6 +11,7 @@ export interface ActivityData {
   sortOrder: number;
   pointValue: number;
   imageUrl: string | null;
+  recurrence: RecurrenceType;
   symbol: {
     id: string;
     name: string;

@@ -22,6 +22,103 @@ export async function getActivitiesForDate(profileId: string, date: Date) {
   });
 }
 
+export async function getActivitiesForRange(profileId: string, start: Date, end: Date) {
+  // Fetch non-recurring activities in the range
+  const regular = await prisma.activity.findMany({
+    where: {
+      profileId,
+      recurrence: null,
+      startTime: { gte: start },
+      endTime: { lte: end },
+    },
+    include: { symbol: true },
+    orderBy: [{ startTime: 'asc' }, { sortOrder: 'asc' }],
+  });
+
+  // Fetch recurring activities that started on or before end of range
+  const recurring = await prisma.activity.findMany({
+    where: {
+      profileId,
+      recurrence: { not: null },
+      startTime: { lte: end },
+    },
+    include: { symbol: true },
+  });
+
+  // Expand recurring activities into per-day instances
+  const expanded = recurring.flatMap((a) => expandRecurring(a, start, end));
+
+  return [...regular, ...expanded].sort(
+    (a, b) => a.startTime.getTime() - b.startTime.getTime(),
+  );
+}
+
+type ActivityWithSymbol = Awaited<
+  ReturnType<typeof prisma.activity.findMany<{ include: { symbol: true } }>>
+>[number];
+
+function expandRecurring(
+  activity: ActivityWithSymbol,
+  rangeStart: Date,
+  rangeEnd: Date,
+): ActivityWithSymbol[] {
+  const results: ActivityWithSymbol[] = [];
+  const origStart = new Date(activity.startTime);
+  const origEnd = new Date(activity.endTime);
+  const durationMs = origEnd.getTime() - origStart.getTime();
+  const origHour = origStart.getHours();
+  const origMinute = origStart.getMinutes();
+
+  // Start from the later of: range start or the activity's original date
+  const iterStart = new Date(Math.max(rangeStart.getTime(), origStart.getTime()));
+  iterStart.setHours(0, 0, 0, 0);
+
+  // Don't generate more than 366 instances for safety
+  const maxDays = Math.min(
+    Math.ceil((rangeEnd.getTime() - iterStart.getTime()) / 86400000) + 1,
+    366,
+  );
+
+  for (let i = 0; i < maxDays; i++) {
+    const day = new Date(iterStart);
+    day.setDate(day.getDate() + i);
+    if (day > rangeEnd) break;
+
+    if (!matchesRecurrence(activity.recurrence!, origStart, day)) continue;
+
+    const instanceStart = new Date(day);
+    instanceStart.setHours(origHour, origMinute, 0, 0);
+    const instanceEnd = new Date(instanceStart.getTime() + durationMs);
+
+    // Skip the original date — it's either already in `regular` or we include it here
+    // Include it since recurring activities are excluded from the regular query
+    results.push({
+      ...activity,
+      startTime: instanceStart,
+      endTime: instanceEnd,
+    });
+  }
+
+  return results;
+}
+
+function matchesRecurrence(recurrence: string, origDate: Date, targetDate: Date): boolean {
+  switch (recurrence) {
+    case 'DAILY':
+      return true;
+    case 'WEEKDAYS': {
+      const dow = targetDate.getDay();
+      return dow >= 1 && dow <= 5;
+    }
+    case 'WEEKLY':
+      return targetDate.getDay() === origDate.getDay();
+    case 'MONTHLY':
+      return targetDate.getDate() === origDate.getDate();
+    default:
+      return false;
+  }
+}
+
 export async function createActivity(formData: FormData) {
   const session = await getSession();
   if (!session?.activeProfileId) redirect('/login');
@@ -35,6 +132,10 @@ export async function createActivity(formData: FormData) {
   const endHour = parseInt(formData.get('endHour') as string);
   const endMinute = parseInt(formData.get('endMinute') as string);
   const pointValue = parseInt((formData.get('pointValue') as string) || '0');
+  const recurrenceVal = (formData.get('recurrence') as string) || null;
+  const recurrence = recurrenceVal && ['DAILY', 'WEEKDAYS', 'WEEKLY', 'MONTHLY'].includes(recurrenceVal)
+    ? (recurrenceVal as 'DAILY' | 'WEEKDAYS' | 'WEEKLY' | 'MONTHLY')
+    : null;
 
   if (!title || !date) {
     return { error: 'Titel och datum krävs.' };
@@ -87,6 +188,7 @@ export async function createActivity(formData: FormData) {
       sortOrder: (maxSort._max.sortOrder ?? 0) + 1,
       profileId: session.activeProfileId,
       symbolId,
+      recurrence,
     },
   });
 
@@ -111,6 +213,10 @@ export async function updateActivity(activityId: string, formData: FormData) {
   const endHour = parseInt(formData.get('endHour') as string);
   const endMinute = parseInt(formData.get('endMinute') as string);
   const pointValue = parseInt((formData.get('pointValue') as string) || '0');
+  const recurrenceVal = (formData.get('recurrence') as string) || null;
+  const recurrence = recurrenceVal && ['DAILY', 'WEEKDAYS', 'WEEKLY', 'MONTHLY'].includes(recurrenceVal)
+    ? (recurrenceVal as 'DAILY' | 'WEEKDAYS' | 'WEEKLY' | 'MONTHLY')
+    : null;
 
   const startTime = new Date(date);
   startTime.setHours(startHour, startMinute, 0, 0);
@@ -128,7 +234,7 @@ export async function updateActivity(activityId: string, formData: FormData) {
     // Using raw update for null
     await prisma.activity.update({
       where: { id: activityId },
-      data: { title, description, color, startTime, endTime, pointValue, symbolId: null },
+      data: { title, description, color, startTime, endTime, pointValue, recurrence, symbolId: null },
     });
     revalidatePath('/');
     return;
@@ -160,6 +266,7 @@ export async function updateActivity(activityId: string, formData: FormData) {
       startTime,
       endTime,
       pointValue,
+      recurrence,
       ...(symbolId !== undefined ? { symbolId } : {}),
     },
   });

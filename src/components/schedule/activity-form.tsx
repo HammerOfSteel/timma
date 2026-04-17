@@ -249,6 +249,21 @@ export function ActivityForm({ date, activity, onSubmit, onClose }: ActivityForm
             </div>
 
             <div>
+              <label className="block text-sm font-medium">Upprepning</label>
+              <select
+                name="recurrence"
+                defaultValue={activity?.recurrence || ''}
+                className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-indigo-500 focus:outline-none"
+              >
+                <option value="">Ingen upprepning</option>
+                <option value="DAILY">Varje dag</option>
+                <option value="WEEKDAYS">Vardagar (mån–fre)</option>
+                <option value="WEEKLY">Varje vecka</option>
+                <option value="MONTHLY">Varje månad</option>
+              </select>
+            </div>
+
+            <div>
               <label className="block text-sm font-medium">Färg</label>
               <div className="mt-2 flex gap-2">
                 {COLORS.map((c) => (

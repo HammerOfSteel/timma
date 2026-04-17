@@ -11,8 +11,15 @@ export default function LoginPage() {
     <div className="flex min-h-full flex-1 items-center justify-center px-4 py-12">
       <div className="w-full max-w-md space-y-8 rounded-2xl bg-white/90 p-8 shadow-2xl backdrop-blur-sm">
         <div className="text-center">
-          <h1 className="text-3xl font-bold text-gray-900">Logga in</h1>
-          <p className="mt-2 text-gray-600">Välkommen tillbaka till Timma</p>
+          <h1
+            className="text-5xl font-bold tracking-tight"
+            style={{ fontFamily: 'var(--font-fredoka), sans-serif' }}
+          >
+            <span className="bg-gradient-to-r from-purple-600 via-violet-500 to-emerald-500 bg-clip-text text-transparent">
+              TIMMA
+            </span>
+          </h1>
+          <p className="mt-2 text-gray-500">Din visuella dagsplanerare</p>
         </div>
 
         <form action={action} className="space-y-6">

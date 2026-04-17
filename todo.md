@@ -43,10 +43,10 @@ The minimum viable product — a functional day planner with visual support that
 
 ### 1.5 Basic Themes
 
-- [ ] Light and dark mode
-- [ ] 3–4 pre-built themes (calm pastel, high contrast, nature, space)
-- [ ] Per-user theme assignment (caregiver setting)
-- [ ] Sensory profile toggle: low stimulation vs. high engagement
+- [x] Light and dark mode
+- [x] 3–4 pre-built themes (calm pastel, high contrast, nature, space)
+- [x] Per-user theme assignment (caregiver setting)
+- [x] Sensory profile toggle: low stimulation vs. high engagement
 
 ### 1.6 Calendar Integration (MVP)
 

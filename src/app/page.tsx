@@ -5,6 +5,8 @@ import { logout } from '@/app/actions/auth';
 import Link from 'next/link';
 import { DaySchedule } from '@/components/schedule/day-schedule';
 import type { ActivityData } from '@/components/schedule/types';
+import { ThemeProvider } from '@/components/theme-provider';
+import { HomeHeader } from '@/components/home-header';
 
 export default async function HomePage() {
   const session = await getSession();
@@ -20,6 +22,11 @@ export default async function HomePage() {
   });
 
   if (!profile) redirect('/profile-select');
+
+  const themes = await prisma.theme.findMany({
+    where: { isBuiltIn: true },
+    orderBy: { name: 'asc' },
+  });
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -53,31 +60,34 @@ export default async function HomePage() {
 
   const dateStr = today.toISOString().split('T')[0];
 
+  // Determine if theme is dark
+  const isDark = profile.theme ? isColorDark(profile.theme.backgroundColor) : false;
+
+  const themeData = profile.theme
+    ? {
+        id: profile.theme.id,
+        name: profile.theme.name,
+        colors: {
+          primaryColor: profile.theme.primaryColor,
+          secondaryColor: profile.theme.secondaryColor,
+          backgroundColor: profile.theme.backgroundColor,
+          textColor: profile.theme.textColor,
+          accentColor: profile.theme.accentColor,
+        },
+        isDark,
+        sensoryMode: profile.sensoryMode as 'LOW_STIMULATION' | 'HIGH_ENGAGEMENT',
+      }
+    : null;
+
   return (
-    <div className="flex min-h-full flex-col">
-      <header className="flex items-center justify-between border-b border-gray-200 px-6 py-4">
-        <div>
-          <h1 className="text-xl font-bold">Timma</h1>
-          <p className="text-sm text-gray-500">{profile.household.name}</p>
-        </div>
-        <div className="flex items-center gap-4">
-          <span className="text-sm font-medium">{profile.name}</span>
-          <Link
-            href="/profile-select"
-            className="rounded-lg border border-gray-300 px-3 py-1.5 text-sm hover:bg-gray-50"
-          >
-            Byt profil
-          </Link>
-          <form action={logout}>
-            <button
-              type="submit"
-              className="rounded-lg border border-gray-300 px-3 py-1.5 text-sm hover:bg-gray-50"
-            >
-              Logga ut
-            </button>
-          </form>
-        </div>
-      </header>
+    <ThemeProvider theme={themeData}>
+      <HomeHeader
+        profileName={profile.name}
+        householdName={profile.household.name}
+        themes={themes}
+        currentThemeId={profile.themeId}
+        currentSensoryMode={profile.sensoryMode as 'LOW_STIMULATION' | 'HIGH_ENGAGEMENT'}
+      />
 
       <DaySchedule
         activities={serializedActivities}
@@ -85,6 +95,14 @@ export default async function HomePage() {
         date={dateStr}
         profileName={profile.name}
       />
-    </div>
+    </ThemeProvider>
   );
+}
+
+function isColorDark(hex: string): boolean {
+  const c = hex.replace('#', '');
+  const r = parseInt(c.substring(0, 2), 16);
+  const g = parseInt(c.substring(2, 4), 16);
+  const b = parseInt(c.substring(4, 6), 16);
+  return (r * 299 + g * 587 + b * 114) / 1000 < 128;
 }

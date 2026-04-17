@@ -8,10 +8,10 @@ export default function SignupPage() {
   const [state, action, pending] = useActionState(signup, undefined);
 
   return (
-    <div className="flex min-h-full items-center justify-center px-4 py-12">
-      <div className="w-full max-w-md space-y-8">
+    <div className="flex min-h-full flex-1 items-center justify-center px-4 py-12">
+      <div className="w-full max-w-md space-y-8 rounded-2xl bg-white/90 p-8 shadow-2xl backdrop-blur-sm">
         <div className="text-center">
-          <h1 className="text-3xl font-bold">Skapa konto</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Skapa konto</h1>
           <p className="mt-2 text-gray-600">Registrera dig för att komma igång med Timma</p>
         </div>
 

@@ -43,9 +43,25 @@ export function HomeHeader({
   return (
     <>
       <header className={`flex items-center justify-between border-b px-6 py-4 ${borderColor}`}>
-        <div>
-          <h1 className="text-xl font-bold">Timma</h1>
-          <p className={`text-sm ${subtextColor}`}>{householdName}</p>
+        <div className="flex items-center gap-4">
+          <div>
+            <h1 className="text-xl font-bold">Timma</h1>
+            <p className={`text-sm ${subtextColor}`}>{householdName}</p>
+          </div>
+          <nav className="flex gap-1">
+            <Link
+              href="/"
+              className={`rounded-lg px-3 py-1.5 text-xs font-medium ${btnClass}`}
+            >
+              Schema
+            </Link>
+            <Link
+              href="/kanban"
+              className={`rounded-lg px-3 py-1.5 text-xs font-medium ${btnClass}`}
+            >
+              Kanban
+            </Link>
+          </nav>
         </div>
         <div className="flex items-center gap-3">
           <span className="text-sm font-medium">{profileName}</span>

@@ -61,6 +61,7 @@ model Profile {
   rewards      Reward[]
   earnedPoints EarnedPoint[]
   todos        Todo[]
+  kanbanBoards KanbanBoard[]
 }
 
 enum Role {
@@ -115,6 +116,9 @@ model Activity {
   // Rewards
   pointValue  Int     @default(0)
   earnedPoints EarnedPoint[]
+
+  // Kanban link
+  kanbanCard  KanbanCard?
 }
 
 enum Recurrence {
@@ -133,7 +137,8 @@ model Symbol {
   category String     // e.g. "food", "activity", "emotion"
   source   SymbolSource @default(MULBERRY)
 
-  activities Activity[]
+  activities  Activity[]
+  kanbanCards KanbanCard[]
 }
 
 enum SymbolSource {
@@ -195,4 +200,52 @@ model Todo {
 
   profileId String
   profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+}
+
+// ─── Kanban ────────────────────────────────────────────────────────────
+
+model KanbanBoard {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  profileId String
+  profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  columns KanbanColumn[]
+}
+
+model KanbanColumn {
+  id        String @id @default(cuid())
+  title     String
+  sortOrder Int    @default(0)
+  color     String @default("#6366f1")
+
+  boardId String
+  board   KanbanBoard @relation(fields: [boardId], references: [id], onDelete: Cascade)
+
+  cards KanbanCard[]
+}
+
+model KanbanCard {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  color       String?
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  columnId String
+  column   KanbanColumn @relation(fields: [columnId], references: [id], onDelete: Cascade)
+
+  // Optional link to a scheduled activity
+  activityId String?   @unique
+  activity   Activity? @relation(fields: [activityId], references: [id], onDelete: SetNull)
+
+  // Visual support
+  symbolId String?
+  symbol   Symbol? @relation(fields: [symbolId], references: [id])
+  imageUrl String?
 }

@@ -94,17 +94,17 @@ Building out the full feature set beyond basic scheduling.
 
 ### 2.4 Teckenstöd (Sign Support)
 
-- [ ] Takk video clip library (curated Swedish sign videos)
-- [ ] Link Takk clips to activities
-- [ ] Video playback on activity cards (tap to play)
-- [ ] Caregiver can upload custom sign videos
+- [x] Takk video clip library (curated Swedish sign videos)
+- [x] Link Takk clips to activities
+- [x] Video playback on activity cards (tap to play)
+- [x] Caregiver can upload custom sign videos
 
 ### 2.5 Enhanced PECS
 
-- [ ] Smart symbol suggestions based on activity text (keyword matching)
-- [ ] Symbol search & browse interface
-- [ ] Favorites / frequently used symbols
-- [ ] Category-based symbol organization
+- [x] Smart symbol suggestions based on activity text (keyword matching)
+- [x] Symbol search & browse interface
+- [x] Favorites / frequently used symbols
+- [x] Category-based symbol organization
 
 ### 2.6 Todo List
 

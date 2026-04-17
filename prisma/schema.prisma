@@ -66,6 +66,7 @@ model Profile {
   todos        Todo[]
   kanbanBoards KanbanBoard[]
   uploadedSignVideos SignVideo[] @relation("UploadedSignVideos")
+  favoriteSymbols  FavoriteSymbol[]
 }
 
 enum Role {
@@ -145,13 +146,27 @@ model Symbol {
   category String     // e.g. "food", "activity", "emotion"
   source   SymbolSource @default(MULBERRY)
 
-  activities  Activity[]
-  kanbanCards KanbanCard[]
+  activities      Activity[]
+  kanbanCards     KanbanCard[]
+  favoriteSymbols FavoriteSymbol[]
 }
 
 enum SymbolSource {
   MULBERRY
   CUSTOM
+}
+
+model FavoriteSymbol {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  profileId String
+  profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  symbolId String
+  symbol   Symbol @relation(fields: [symbolId], references: [id], onDelete: Cascade)
+
+  @@unique([profileId, symbolId])
 }
 
 model SignVideo {

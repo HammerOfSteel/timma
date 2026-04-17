@@ -49,6 +49,7 @@ export function ActivityForm({ date, activity, onSubmit, onClose }: ActivityForm
     word: string;
     videoUrl: string;
   } | null>(activity?.signVideo || null);
+  const [titleValue, setTitleValue] = useState(activity?.title || '');
 
   function handleSymbolSelect(file: string, name: string) {
     setSelectedSymbol({ file, name });
@@ -109,7 +110,8 @@ export function ActivityForm({ date, activity, onSubmit, onClose }: ActivityForm
                 name="title"
                 type="text"
                 required
-                defaultValue={activity?.title}
+                value={titleValue}
+                onChange={(e) => setTitleValue(e.target.value)}
                 className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500 focus:outline-none"
                 placeholder="T.ex. Frukost"
               />
@@ -356,7 +358,11 @@ export function ActivityForm({ date, activity, onSubmit, onClose }: ActivityForm
       </div>
 
       {showSymbolPicker && (
-        <SymbolPicker onSelect={handleSymbolSelect} onClose={() => setShowSymbolPicker(false)} />
+        <SymbolPicker
+          onSelect={handleSymbolSelect}
+          onClose={() => setShowSymbolPicker(false)}
+          activityTitle={titleValue}
+        />
       )}
       {showSignPicker && (
         <SignVideoPicker

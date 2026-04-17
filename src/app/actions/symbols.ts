@@ -128,3 +128,116 @@ export async function removeActivityImage(activityId: string) {
 
   revalidatePath('/');
 }
+
+/**
+ * Add a symbol to the user's favorites.
+ */
+export async function addFavoriteSymbol(symbolFile: string, symbolName: string) {
+  const session = await getSession();
+  if (!session?.activeProfileId) redirect('/login');
+
+  // Find or create the Symbol record
+  let symbol = await prisma.symbol.findFirst({
+    where: { imageUrl: `/symbols/mulberry/${symbolFile}`, source: 'MULBERRY' },
+  });
+
+  if (!symbol) {
+    symbol = await prisma.symbol.create({
+      data: {
+        name: symbolName,
+        imageUrl: `/symbols/mulberry/${symbolFile}`,
+        category: 'mulberry',
+        source: 'MULBERRY',
+      },
+    });
+  }
+
+  await prisma.favoriteSymbol.upsert({
+    where: {
+      profileId_symbolId: {
+        profileId: session.activeProfileId,
+        symbolId: symbol.id,
+      },
+    },
+    update: {},
+    create: {
+      profileId: session.activeProfileId,
+      symbolId: symbol.id,
+    },
+  });
+}
+
+/**
+ * Remove a symbol from the user's favorites.
+ */
+export async function removeFavoriteSymbol(symbolFile: string) {
+  const session = await getSession();
+  if (!session?.activeProfileId) redirect('/login');
+
+  const symbol = await prisma.symbol.findFirst({
+    where: { imageUrl: `/symbols/mulberry/${symbolFile}`, source: 'MULBERRY' },
+  });
+
+  if (symbol) {
+    await prisma.favoriteSymbol.deleteMany({
+      where: {
+        profileId: session.activeProfileId,
+        symbolId: symbol.id,
+      },
+    });
+  }
+}
+
+/**
+ * Get the user's favorite symbol files for the picker.
+ */
+export async function getFavoriteSymbols(): Promise<string[]> {
+  const session = await getSession();
+  if (!session?.activeProfileId) return [];
+
+  const favorites = await prisma.favoriteSymbol.findMany({
+    where: { profileId: session.activeProfileId },
+    include: { symbol: true },
+    orderBy: { createdAt: 'desc' },
+  });
+
+  return favorites.map((f) => f.symbol.imageUrl.replace('/symbols/mulberry/', ''));
+}
+
+/**
+ * Get frequently used symbol files (based on activity usage).
+ */
+export async function getFrequentSymbols(): Promise<Array<{ file: string; name: string; count: number }>> {
+  const session = await getSession();
+  if (!session?.activeProfileId) return [];
+
+  const result = await prisma.activity.groupBy({
+    by: ['symbolId'],
+    where: {
+      profileId: session.activeProfileId,
+      symbolId: { not: null },
+    },
+    _count: { symbolId: true },
+    orderBy: { _count: { symbolId: 'desc' } },
+    take: 12,
+  });
+
+  if (result.length === 0) return [];
+
+  const symbolIds = result.map((r) => r.symbolId!);
+  const symbols = await prisma.symbol.findMany({
+    where: { id: { in: symbolIds } },
+  });
+
+  const symbolMap = new Map(symbols.map((s) => [s.id, s]));
+  return result
+    .filter((r) => symbolMap.has(r.symbolId!))
+    .map((r) => {
+      const s = symbolMap.get(r.symbolId!)!;
+      return {
+        file: s.imageUrl.replace('/symbols/mulberry/', ''),
+        name: s.name,
+        count: r._count.symbolId,
+      };
+    });
+}

@@ -47,12 +47,12 @@ function parseCSV(csvText: string): SymbolEntry[] {
 
   for (let i = 1; i < lines.length; i++) {
     const cols = parseCSVLine(lines[i]);
-    if (cols.length < 8) continue;
+    if (cols.length < 7) continue;
 
     const id = cols[0];
-    const tags = cols[5].split(/\s+/).filter((t) => t.trim());
-    const filename = cols[6].trim();
-    const category = cols[7].trim();
+    const tags = cols[4].split(/\s+/).filter((t) => t.trim());
+    const filename = cols[5].trim();
+    const category = cols[6].trim();
 
     if (!filename) continue;
 

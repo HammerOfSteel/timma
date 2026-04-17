@@ -26,7 +26,7 @@ export default async function KanbanPage() {
 
   const allProfiles = await prisma.profile.findMany({
     where: { householdId: session.householdId },
-    select: { id: true, name: true },
+    select: { id: true, name: true, avatarUrl: true },
     orderBy: { createdAt: 'asc' },
   });
 
@@ -67,6 +67,7 @@ export default async function KanbanPage() {
       pointValue: a.pointValue,
       profileId: a.profileId,
       profileName: a.profile.name,
+      profileAvatarUrl: a.profile.avatarUrl ?? null,
       symbol: a.symbol ? { name: a.symbol.name, imageUrl: a.symbol.imageUrl } : null,
       imageUrl: a.imageUrl,
     })),

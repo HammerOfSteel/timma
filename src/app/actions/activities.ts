@@ -60,7 +60,7 @@ export async function getActivitiesForRangeMultiProfile(profileIds: string[], st
       startTime: { not: null, gte: start },
       endTime: { not: null, lte: end },
     },
-    include: { symbol: true, signVideo: true, profile: { select: { id: true, name: true } } },
+    include: { symbol: true, signVideo: true, profile: { select: { id: true, name: true, avatarUrl: true } } },
     orderBy: [{ startTime: 'asc' }, { sortOrder: 'asc' }],
   });
 
@@ -70,7 +70,7 @@ export async function getActivitiesForRangeMultiProfile(profileIds: string[], st
       recurrence: { not: null },
       startTime: { not: null, lte: end },
     },
-    include: { symbol: true, signVideo: true, profile: { select: { id: true, name: true } } },
+    include: { symbol: true, signVideo: true, profile: { select: { id: true, name: true, avatarUrl: true } } },
   });
 
   const expanded = recurring.flatMap((a) => expandRecurring(a, start, end));
@@ -100,7 +100,7 @@ export async function getBacklogTasksForHousehold(householdId: string) {
     include: {
       symbol: true,
       signVideo: true,
-      profile: { select: { id: true, name: true } },
+      profile: { select: { id: true, name: true, avatarUrl: true } },
     },
     orderBy: [
       { status: 'asc' },

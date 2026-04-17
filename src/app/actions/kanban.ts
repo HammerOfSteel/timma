@@ -16,7 +16,7 @@ export async function getKanbanBoard(householdId: string) {
             orderBy: { sortOrder: 'asc' },
             include: {
               symbol: true,
-              profile: { select: { id: true, name: true } },
+              profile: { select: { id: true, name: true, avatarUrl: true } },
             },
           },
         },
@@ -45,13 +45,49 @@ export async function getKanbanBoard(householdId: string) {
               orderBy: { sortOrder: 'asc' },
               include: {
                 symbol: true,
-                profile: { select: { id: true, name: true } },
+                profile: { select: { id: true, name: true, avatarUrl: true } },
               },
             },
           },
         },
       },
     });
+  }
+
+  // Auto-place unplaced household activities into columns based on status
+  if (board.columns.length >= 1) {
+    const unplaced = await prisma.activity.findMany({
+      where: {
+        profile: { householdId },
+        kanbanColumnId: null,
+      },
+      include: {
+        symbol: true,
+        profile: { select: { id: true, name: true, avatarUrl: true } },
+      },
+      orderBy: { sortOrder: 'asc' },
+    });
+
+    if (unplaced.length > 0) {
+      const cols = board.columns;
+      const firstCol = cols[0];
+      const lastCol = cols[cols.length - 1];
+      const midCol = cols.length > 2 ? cols[1] : firstCol;
+
+      for (const activity of unplaced) {
+        let targetCol = firstCol;
+        if (activity.status === 'DONE') targetCol = lastCol;
+        else if (activity.status === 'IN_PROGRESS') targetCol = midCol;
+
+        await prisma.activity.update({
+          where: { id: activity.id },
+          data: { kanbanColumnId: targetCol.id },
+        });
+
+        // Add to the in-memory board data too
+        targetCol.activities.push(activity as any);
+      }
+    }
   }
 
   return board;

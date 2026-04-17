@@ -127,6 +127,7 @@ async function main() {
       data: {
         name: 'Erik',
         pin: '1234',
+        avatarUrl: '🧑‍🎓',
         role: Role.USER,
         householdId: household.id,
         viewMode: ViewMode.CARDS,
@@ -140,6 +141,7 @@ async function main() {
       data: {
         name: 'Maja',
         pin: '5678',
+        avatarUrl: '🧑‍🎨',
         role: Role.USER,
         householdId: household.id,
         viewMode: ViewMode.BLOCKS,
@@ -153,6 +155,7 @@ async function main() {
       data: {
         name: 'Admin',
         pin: '0000',
+        avatarUrl: '👨‍💻',
         role: Role.ADMIN,
         householdId: household.id,
         viewMode: ViewMode.TIMELINE,

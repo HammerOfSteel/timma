@@ -24,6 +24,7 @@ interface CardData {
   pointValue: number;
   profileId: string;
   profileName: string;
+  profileAvatarUrl: string | null;
   symbol: { name: string; imageUrl: string } | null;
   imageUrl: string | null;
 }
@@ -40,7 +41,7 @@ interface KanbanBoardProps {
   boardId: string;
   boardName: string;
   columns: ColumnData[];
-  profiles: { id: string; name: string }[];
+  profiles: { id: string; name: string; avatarUrl: string | null }[];
 }
 
 const CARD_COLORS = [
@@ -119,7 +120,7 @@ export function KanbanBoard({ boardId, boardName, columns, profiles }: KanbanBoa
   }
 
   function handleDeleteColumn(columnId: string) {
-    if (!confirm('Ta bort kolumnen och flytta uppgifter tillbaka till backlog?')) return;
+    if (!confirm('Ta bort kolumnen och flytta uppgifter tillbaka till listan?')) return;
     startTransition(() => {
       deleteKanbanColumn(columnId);
     });
@@ -207,7 +208,8 @@ export function KanbanBoard({ boardId, boardName, columns, profiles }: KanbanBoa
 
                     {/* Footer: profile + schedule + points */}
                     <div className="mt-2 flex items-center gap-1.5 flex-wrap">
-                      <span className={`rounded-full px-1.5 py-0.5 text-[9px] font-medium text-white ${PROFILE_COLORS[profileIdx >= 0 ? profileIdx % PROFILE_COLORS.length : 0]}`}>
+                      <span className={`flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[9px] font-medium text-white ${PROFILE_COLORS[profileIdx >= 0 ? profileIdx % PROFILE_COLORS.length : 0]}`}>
+                        {card.profileAvatarUrl ? <span className="text-[10px]">{card.profileAvatarUrl}</span> : <span>{card.profileName[0]}</span>}
                         {card.profileName}
                       </span>
                       {card.startTime && (

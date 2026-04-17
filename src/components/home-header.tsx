@@ -23,7 +23,7 @@ interface HomeHeaderProps {
   currentSensoryMode: 'LOW_STIMULATION' | 'HIGH_ENGAGEMENT';
   calendarToken: string | null;
   familyView?: boolean;
-  familyProfiles?: { id: string; name: string }[];
+  familyProfiles?: { id: string; name: string; avatarUrl: string | null }[];
   activeFilterIds?: string[];
 }
 
@@ -87,7 +87,7 @@ export function HomeHeader({
                 Belöningar
               </Link>
               <Link href="/todos" className={`rounded-lg px-3 py-1.5 text-xs font-medium ${btnClass}`}>
-                Backlog
+                Att göra
               </Link>
             </nav>
           </div>
@@ -130,7 +130,7 @@ export function HomeHeader({
                       : 'bg-gray-200 text-gray-500 hover:bg-gray-300'
                   }`}
                 >
-                  <span className="text-xs">{p.name[0]}</span>
+                  <span className="text-xs">{p.avatarUrl || p.name[0]}</span>
                   {p.name}
                 </button>
               );

@@ -28,7 +28,7 @@ export default async function BacklogPage() {
   const allProfiles = isFamilyView
     ? await prisma.profile.findMany({
         where: { householdId: session.householdId },
-        select: { id: true, name: true },
+        select: { id: true, name: true, avatarUrl: true },
         orderBy: { createdAt: 'asc' },
       })
     : [];
@@ -51,6 +51,7 @@ export default async function BacklogPage() {
     recurrence: t.recurrence ?? null,
     profileId: t.profileId,
     profileName: t.profile?.name ?? profile.name,
+    profileAvatarUrl: t.profile?.avatarUrl ?? null,
     symbol: t.symbol ? { id: t.symbol.id, name: t.symbol.name, imageUrl: t.symbol.imageUrl } : null,
     signVideo: t.signVideo ? { id: t.signVideo.id, word: t.signVideo.word, videoUrl: t.signVideo.videoUrl } : null,
   }));
@@ -94,7 +95,7 @@ export default async function BacklogPage() {
           <a href="/" className="rounded-lg px-3 py-1.5 text-xs font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700">
             ← Schema
           </a>
-          <h2 className="text-sm font-semibold">Backlog</h2>
+          <h2 className="text-sm font-semibold">Att göra</h2>
         </div>
       </div>
 
@@ -102,7 +103,7 @@ export default async function BacklogPage() {
         tasks={tasks}
         isAdmin={isAdmin}
         isFamilyView={isFamilyView}
-        profiles={isFamilyView ? allProfiles : [{ id: profile.id, name: profile.name }]}
+        profiles={isFamilyView ? allProfiles : [{ id: profile.id, name: profile.name, avatarUrl: profile.avatarUrl }]}
       />
     </ThemeProvider>
   );

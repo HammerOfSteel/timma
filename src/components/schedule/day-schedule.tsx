@@ -20,10 +20,12 @@ interface DayScheduleProps {
   date: string;
   profileName: string;
   isFamilyView?: boolean;
-  familyProfiles?: { id: string; name: string }[];
+  familyProfiles?: { id: string; name: string; avatarUrl: string | null }[];
 }
 
-export function DaySchedule({ activities, viewMode, date, profileName }: DayScheduleProps) {
+const PROFILE_COLORS = ['#6366f1', '#10b981', '#f59e0b', '#f43f5e', '#06b6d4', '#a855f7'];
+
+export function DaySchedule({ activities, viewMode, date, profileName, isFamilyView, familyProfiles = [] }: DayScheduleProps) {
   const [showForm, setShowForm] = useState(false);
   const [editingActivity, setEditingActivity] = useState<ActivityData | null>(null);
   const [currentView, setCurrentView] = useState(viewMode);
@@ -133,9 +135,45 @@ export function DaySchedule({ activities, viewMode, date, profileName }: DaySche
       )}
 
       {/* View */}
-      {currentView === 'BLOCKS' && <BlockView {...viewProps} />}
-      {currentView === 'CARDS' && <CardStripView {...viewProps} />}
-      {currentView === 'TIMELINE' && <TimelineView {...viewProps} />}
+      {isFamilyView && familyProfiles.length > 1 ? (
+        <div className="flex flex-1 overflow-x-auto">
+          {familyProfiles
+            .map((fp, originalIdx) => ({ fp, originalIdx }))
+            .filter(({ fp }) => activities.some((a) => a.profileId === fp.id))
+            .map(({ fp, originalIdx }) => {
+            const profileActivities = activities.filter((a) => a.profileId === fp.id);
+            const profileViewProps = {
+              activities: profileActivities,
+              date,
+              onToggleComplete: handleToggleComplete,
+              onEdit: handleEdit,
+              onDelete: handleDelete,
+              onReorder: handleReorder,
+            };
+            const accentColor = PROFILE_COLORS[originalIdx % PROFILE_COLORS.length];
+            return (
+              <div key={fp.id} className="flex min-w-[280px] flex-1 flex-col border-r border-gray-100 last:border-r-0">
+                <div className="flex items-center gap-2 border-b border-gray-100 px-3 py-2">
+                  <div className="flex h-7 w-7 items-center justify-center rounded-full text-sm font-bold text-white" style={{ backgroundColor: accentColor }}>
+                    {fp.avatarUrl || fp.name[0]}
+                  </div>
+                  <span className="text-xs font-semibold">{fp.name}</span>
+                  <span className="text-[10px] text-gray-400">{profileActivities.length}</span>
+                </div>
+                {currentView === 'BLOCKS' && <BlockView {...profileViewProps} />}
+                {currentView === 'CARDS' && <CardStripView {...profileViewProps} />}
+                {currentView === 'TIMELINE' && <TimelineView {...profileViewProps} />}
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        <>
+          {currentView === 'BLOCKS' && <BlockView {...viewProps} />}
+          {currentView === 'CARDS' && <CardStripView {...viewProps} />}
+          {currentView === 'TIMELINE' && <TimelineView {...viewProps} />}
+        </>
+      )}
 
       {/* Activity form modal */}
       {showForm && (

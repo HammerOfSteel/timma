@@ -10,7 +10,7 @@ import { SymbolPicker } from '@/components/schedule/symbol-picker';
 import type { ActivityData, TaskStatus } from '@/components/schedule/types';
 
 const STATUS_CONFIG: Record<TaskStatus, { label: string; color: string; bg: string }> = {
-  BACKLOG: { label: 'Backlog', color: 'text-gray-600', bg: 'bg-gray-100' },
+  BACKLOG: { label: 'Att göra', color: 'text-gray-600', bg: 'bg-gray-100' },
   TODO: { label: 'Att göra', color: 'text-blue-600', bg: 'bg-blue-100' },
   IN_PROGRESS: { label: 'Pågår', color: 'text-amber-600', bg: 'bg-amber-100' },
   DONE: { label: 'Klart', color: 'text-green-600', bg: 'bg-green-100' },
@@ -22,7 +22,7 @@ interface BacklogListProps {
   tasks: ActivityData[];
   isAdmin: boolean;
   isFamilyView: boolean;
-  profiles: { id: string; name: string }[];
+  profiles: { id: string; name: string; avatarUrl: string | null }[];
 }
 
 export function BacklogList({ tasks, isAdmin, isFamilyView, profiles }: BacklogListProps) {
@@ -122,7 +122,7 @@ export function BacklogList({ tasks, isAdmin, isFamilyView, profiles }: BacklogL
       {grouped.active.length === 0 && grouped.done.length === 0 && !showAddForm && (
         <div className="py-12 text-center text-gray-400">
           <p className="text-3xl">📋</p>
-          <p className="mt-2 text-sm">Inga uppgifter i backlogen</p>
+          <p className="mt-2 text-sm">Inga uppgifter i listan</p>
         </div>
       )}
 
@@ -227,7 +227,8 @@ function TaskRow({
 
       {/* Profile badge */}
       {showProfile && task.profileName && (
-        <span className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium text-white ${PROFILE_COLORS[profileIdx >= 0 ? profileIdx % PROFILE_COLORS.length : 0]}`}>
+        <span className={`flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium text-white ${PROFILE_COLORS[profileIdx >= 0 ? profileIdx % PROFILE_COLORS.length : 0]}`}>
+          {task.profileAvatarUrl ? <span className="text-xs">{task.profileAvatarUrl}</span> : null}
           {task.profileName}
         </span>
       )}
@@ -239,7 +240,7 @@ function TaskRow({
         disabled={isPending}
         className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium ${cfg.bg} ${cfg.color} border-0 focus:outline-none`}
       >
-        <option value="BACKLOG">Backlog</option>
+        <option value="BACKLOG">Att göra</option>
         <option value="TODO">Att göra</option>
         <option value="IN_PROGRESS">Pågår</option>
         <option value="DONE">Klart</option>

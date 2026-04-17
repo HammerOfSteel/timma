@@ -15,6 +15,7 @@ export interface ActivityData {
   recurrence: RecurrenceType;
   profileId?: string;
   profileName?: string;
+  profileAvatarUrl?: string | null;
   symbol: {
     id: string;
     name: string;

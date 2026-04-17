@@ -51,7 +51,7 @@ export default async function HomePage({
   const allProfiles = isFamilyView
     ? await prisma.profile.findMany({
         where: { householdId: session.householdId },
-        select: { id: true, name: true },
+        select: { id: true, name: true, avatarUrl: true },
         orderBy: { createdAt: 'asc' },
       })
     : [];
@@ -118,6 +118,7 @@ export default async function HomePage({
     recurrence: (a.recurrence as ActivityData['recurrence']) ?? null,
     profileId: a.profileId,
     profileName: a.profile?.name ?? undefined,
+    profileAvatarUrl: a.profile?.avatarUrl ?? null,
     symbol: a.symbol ? { id: a.symbol.id, name: a.symbol.name, imageUrl: a.symbol.imageUrl } : null,
     signVideo: a.signVideo ? { id: a.signVideo.id, word: a.signVideo.word, videoUrl: a.signVideo.videoUrl } : null,
   }));

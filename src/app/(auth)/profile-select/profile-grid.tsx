@@ -61,7 +61,7 @@ export function ProfileGrid({ profiles }: { profiles: ProfileInfo[] }) {
         <div
           className={`flex h-24 w-24 items-center justify-center rounded-full text-3xl font-bold text-white ${colors[profiles.indexOf(selectedProfile) % colors.length]}`}
         >
-          {selectedProfile.name[0].toUpperCase()}
+          {selectedProfile.avatarUrl || selectedProfile.name[0].toUpperCase()}
         </div>
         <h2 className="text-xl font-semibold">{selectedProfile.name}</h2>
 
@@ -115,7 +115,7 @@ export function ProfileGrid({ profiles }: { profiles: ProfileInfo[] }) {
             <div
               className={`flex h-20 w-20 items-center justify-center rounded-full text-2xl font-bold text-white ${colors[i % colors.length]}`}
             >
-              {profile.name[0].toUpperCase()}
+              {profile.avatarUrl || profile.name[0].toUpperCase()}
             </div>
             <span className="text-sm font-medium">{profile.name}</span>
             {profile.hasPin && <span className="text-xs text-gray-400">🔒</span>}

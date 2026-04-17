@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="152" height="152" viewBox="0 0 152 152">
+  <rect width="152" height="152" rx="30.400000000000002" fill="#6366f1"/>
+  <circle cx="76" cy="76" r="68.4" fill="white" opacity="0.2"/>
+  <circle cx="76" cy="76" r="60.800000000000004" fill="none" stroke="white" stroke-width="6.08"/>
+  <!-- Hour hand -->
+  <line x1="76" y1="76" x2="76" y2="42.559999999999995" stroke="white" stroke-width="6.84" stroke-linecap="round"/>
+  <!-- Minute hand -->
+  <line x1="76" y1="76" x2="100.32000000000001" y2="57.76" stroke="white" stroke-width="4.56" stroke-linecap="round"/>
+  <!-- Center dot -->
+  <circle cx="76" cy="76" r="4.56" fill="white"/>
+  <!-- Hour markers -->
+  <line x1="76.0" y1="24.3" x2="76.0" y2="18.2" stroke="white" stroke-width="3.04" stroke-linecap="round"/>
+  <line x1="101.8" y1="31.2" x2="104.9" y2="26.0" stroke="white" stroke-width="3.04" stroke-linecap="round"/>
+  <line x1="120.8" y1="50.2" x2="126.0" y2="47.1" stroke="white" stroke-width="3.04" stroke-linecap="round"/>
+  <line x1="127.7" y1="76.0" x2="133.8" y2="76.0" stroke="white" stroke-width="3.04" stroke-linecap="round"/>
+  <line x1="120.8" y1="101.8" x2="126.0" y2="104.9" stroke="white" stroke-width="3.04" stroke-linecap="round"/>
+  <line x1="101.8" y1="120.8" x2="104.9" y2="126.0" stroke="white" stroke-width="3.04" stroke-linecap="round"/>
+  <line x1="76.0" y1="127.7" x2="76.0" y2="133.8" stroke="white" stroke-width="3.04" stroke-linecap="round"/>
+  <line x1="50.2" y1="120.8" x2="47.1" y2="126.0" stroke="white" stroke-width="3.04" stroke-linecap="round"/>
+  <line x1="31.2" y1="101.8" x2="26.0" y2="104.9" stroke="white" stroke-width="3.04" stroke-linecap="round"/>
+  <line x1="24.3" y1="76.0" x2="18.2" y2="76.0" stroke="white" stroke-width="3.04" stroke-linecap="round"/>
+  <line x1="31.2" y1="50.2" x2="26.0" y2="47.1" stroke="white" stroke-width="3.04" stroke-linecap="round"/>
+  <line x1="50.2" y1="31.2" x2="47.1" y2="26.0" stroke="white" stroke-width="3.04" stroke-linecap="round"/>
+</svg>

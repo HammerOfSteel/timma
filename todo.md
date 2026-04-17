@@ -56,10 +56,10 @@ The minimum viable product — a functional day planner with visual support that
 
 ### 1.7 PWA & Offline
 
-- [ ] App manifest with icons and splash screens
-- [ ] Offline schedule viewing (cache current day/week)
-- [ ] Install prompt on supported browsers
-- [ ] Background sync for schedule changes made offline
+- [x] App manifest with icons and splash screens
+- [x] Offline schedule viewing (cache current day/week)
+- [x] Install prompt on supported browsers
+- [x] Background sync for schedule changes made offline
 
 ---
 

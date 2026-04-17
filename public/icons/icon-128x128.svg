@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <rect width="128" height="128" rx="25.6" fill="#6366f1"/>
+  <circle cx="64" cy="64" r="57.6" fill="white" opacity="0.2"/>
+  <circle cx="64" cy="64" r="51.2" fill="none" stroke="white" stroke-width="5.12"/>
+  <!-- Hour hand -->
+  <line x1="64" y1="64" x2="64" y2="35.839999999999996" stroke="white" stroke-width="5.76" stroke-linecap="round"/>
+  <!-- Minute hand -->
+  <line x1="64" y1="64" x2="84.48" y2="48.64" stroke="white" stroke-width="3.84" stroke-linecap="round"/>
+  <!-- Center dot -->
+  <circle cx="64" cy="64" r="3.84" fill="white"/>
+  <!-- Hour markers -->
+  <line x1="64.0" y1="20.5" x2="64.0" y2="15.4" stroke="white" stroke-width="2.56" stroke-linecap="round"/>
+  <line x1="85.8" y1="26.3" x2="88.3" y2="21.9" stroke="white" stroke-width="2.56" stroke-linecap="round"/>
+  <line x1="101.7" y1="42.2" x2="106.1" y2="39.7" stroke="white" stroke-width="2.56" stroke-linecap="round"/>
+  <line x1="107.5" y1="64.0" x2="112.6" y2="64.0" stroke="white" stroke-width="2.56" stroke-linecap="round"/>
+  <line x1="101.7" y1="85.8" x2="106.1" y2="88.3" stroke="white" stroke-width="2.56" stroke-linecap="round"/>
+  <line x1="85.8" y1="101.7" x2="88.3" y2="106.1" stroke="white" stroke-width="2.56" stroke-linecap="round"/>
+  <line x1="64.0" y1="107.5" x2="64.0" y2="112.6" stroke="white" stroke-width="2.56" stroke-linecap="round"/>
+  <line x1="42.2" y1="101.7" x2="39.7" y2="106.1" stroke="white" stroke-width="2.56" stroke-linecap="round"/>
+  <line x1="26.3" y1="85.8" x2="21.9" y2="88.3" stroke="white" stroke-width="2.56" stroke-linecap="round"/>
+  <line x1="20.5" y1="64.0" x2="15.4" y2="64.0" stroke="white" stroke-width="2.56" stroke-linecap="round"/>
+  <line x1="26.3" y1="42.2" x2="21.9" y2="39.7" stroke="white" stroke-width="2.56" stroke-linecap="round"/>
+  <line x1="42.2" y1="26.3" x2="39.7" y2="21.9" stroke="white" stroke-width="2.56" stroke-linecap="round"/>
+</svg>

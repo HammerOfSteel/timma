@@ -64,17 +64,17 @@ Timma is a flexible, accessible planning tool that empowers individuals with NPF
 
 ## Tech Stack
 
-| Layer       | Technology                          |
-| ----------- | ----------------------------------- |
-| Language    | TypeScript (end-to-end)             |
-| Frontend    | Next.js (React, SSR/SSG)           |
-| Styling     | TBD (Tailwind CSS recommended)      |
-| PWA         | next-pwa or Serwist                 |
-| Database    | PostgreSQL                          |
-| ORM         | Prisma (recommended)                |
-| Auth        | Custom (PIN profiles) + NextAuth.js |
-| Deployment  | Docker Compose                      |
-| CI/CD       | TBD                                 |
+| Layer      | Technology                          |
+| ---------- | ----------------------------------- |
+| Language   | TypeScript (end-to-end)             |
+| Frontend   | Next.js (React, SSR/SSG)            |
+| Styling    | TBD (Tailwind CSS recommended)      |
+| PWA        | next-pwa or Serwist                 |
+| Database   | PostgreSQL                          |
+| ORM        | Prisma (recommended)                |
+| Auth       | Custom (PIN profiles) + NextAuth.js |
+| Deployment | Docker Compose                      |
+| CI/CD      | TBD                                 |
 
 ## Platform
 

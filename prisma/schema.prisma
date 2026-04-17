@@ -1,0 +1,195 @@
+// Timma — database schema
+// https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Authentication & Users ────────────────────────────────────────────
+
+model Household {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  caregiver Caregiver?
+  profiles  Profile[]
+}
+
+model Caregiver {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  householdId String    @unique
+  household   Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
+}
+
+model Profile {
+  id        String   @id @default(cuid())
+  name      String
+  avatarUrl String?
+  pin       String?  // Simple PIN for profile switching
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  householdId String
+  household   Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
+
+  // Preferences
+  viewMode     ViewMode     @default(BLOCKS)
+  themeId      String?
+  theme        Theme?       @relation(fields: [themeId], references: [id])
+  sensoryMode  SensoryMode  @default(LOW_STIMULATION)
+  rewardType   RewardType   @default(POINTS)
+
+  // Relations
+  activities   Activity[]
+  rewards      Reward[]
+  earnedPoints EarnedPoint[]
+  todos        Todo[]
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+enum ViewMode {
+  TIMELINE
+  BLOCKS
+  CARDS
+}
+
+enum SensoryMode {
+  LOW_STIMULATION
+  HIGH_ENGAGEMENT
+}
+
+enum RewardType {
+  POINTS
+  TOKENS
+  STARS
+  BADGES
+}
+
+// ─── Scheduling ────────────────────────────────────────────────────────
+
+model Activity {
+  id          String    @id @default(cuid())
+  title       String
+  description String?
+  color       String?   // Hex color for the activity block
+  startTime   DateTime
+  endTime     DateTime
+  allDay      Boolean   @default(false)
+  completed   Boolean   @default(false)
+  sortOrder   Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Recurrence
+  recurrence  Recurrence?
+
+  profileId String
+  profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  // Visual support
+  symbolId String?
+  symbol   Symbol? @relation(fields: [symbolId], references: [id])
+  imageUrl String? // Custom uploaded image
+
+  // Rewards
+  pointValue  Int     @default(0)
+  earnedPoints EarnedPoint[]
+}
+
+enum Recurrence {
+  DAILY
+  WEEKDAYS
+  WEEKLY
+  MONTHLY
+}
+
+// ─── Visual Support (PECS & Teckenstöd) ───────────────────────────────
+
+model Symbol {
+  id       String     @id @default(cuid())
+  name     String
+  imageUrl String
+  category String     // e.g. "food", "activity", "emotion"
+  source   SymbolSource @default(MULBERRY)
+
+  activities Activity[]
+}
+
+enum SymbolSource {
+  MULBERRY
+  CUSTOM
+}
+
+// ─── Reward System ─────────────────────────────────────────────────────
+
+model Reward {
+  id          String @id @default(cuid())
+  name        String
+  description String?
+  iconUrl     String?
+  cost        Int    // Points/tokens needed to redeem
+  createdAt   DateTime @default(now())
+
+  profileId String
+  profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+}
+
+model EarnedPoint {
+  id        String   @id @default(cuid())
+  amount    Int
+  reason    String?
+  createdAt DateTime @default(now())
+
+  profileId  String
+  profile    Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  activityId String?
+  activity   Activity? @relation(fields: [activityId], references: [id], onDelete: SetNull)
+}
+
+// ─── Themes ────────────────────────────────────────────────────────────
+
+model Theme {
+  id              String  @id @default(cuid())
+  name            String
+  isBuiltIn       Boolean @default(false)
+  primaryColor    String
+  secondaryColor  String
+  backgroundColor String
+  textColor       String
+  accentColor     String
+
+  profiles Profile[]
+}
+
+// ─── Todos ─────────────────────────────────────────────────────────────
+
+model Todo {
+  id        String   @id @default(cuid())
+  title     String
+  completed Boolean  @default(false)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  profileId String
+  profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+}

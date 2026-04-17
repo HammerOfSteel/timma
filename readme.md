@@ -23,16 +23,16 @@ Timma is a **Progressive Web App** that helps individuals with ADHD, autism, int
 
 ## Tech Stack
 
-| Layer      | Technology                      |
-| ---------- | ------------------------------- |
-| Language   | TypeScript (end-to-end)         |
-| Frontend   | Next.js (React)                 |
-| Styling    | Tailwind CSS                    |
-| PWA        | next-pwa / Serwist              |
-| Database   | PostgreSQL                      |
-| ORM        | Prisma                          |
-| Auth       | NextAuth.js + PIN-based profiles|
-| Deployment | Docker Compose                  |
+| Layer      | Technology                       |
+| ---------- | -------------------------------- |
+| Language   | TypeScript (end-to-end)          |
+| Frontend   | Next.js (React)                  |
+| Styling    | Tailwind CSS                     |
+| PWA        | next-pwa / Serwist               |
+| Database   | PostgreSQL                       |
+| ORM        | Prisma                           |
+| Auth       | NextAuth.js + PIN-based profiles |
+| Deployment | Docker Compose                   |
 
 ## Getting Started
 

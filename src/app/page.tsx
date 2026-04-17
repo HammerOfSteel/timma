@@ -3,6 +3,8 @@ import { getSession } from '@/lib/session';
 import { prisma } from '@/lib/db';
 import { logout } from '@/app/actions/auth';
 import Link from 'next/link';
+import { DaySchedule } from '@/components/schedule/day-schedule';
+import type { ActivityData } from '@/components/schedule/types';
 
 export default async function HomePage() {
   const session = await getSession();
@@ -18,6 +20,38 @@ export default async function HomePage() {
   });
 
   if (!profile) redirect('/profile-select');
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const endOfDay = new Date(today);
+  endOfDay.setHours(23, 59, 59, 999);
+
+  const activities = await prisma.activity.findMany({
+    where: {
+      profileId: profile.id,
+      startTime: { gte: today },
+      endTime: { lte: endOfDay },
+    },
+    include: { symbol: true },
+    orderBy: [{ sortOrder: 'asc' }, { startTime: 'asc' }],
+  });
+
+  // Serialize dates for client components
+  const serializedActivities: ActivityData[] = activities.map((a) => ({
+    id: a.id,
+    title: a.title,
+    description: a.description,
+    color: a.color,
+    startTime: a.startTime.toISOString(),
+    endTime: a.endTime.toISOString(),
+    completed: a.completed,
+    sortOrder: a.sortOrder,
+    pointValue: a.pointValue,
+    imageUrl: a.imageUrl,
+    symbol: a.symbol ? { id: a.symbol.id, name: a.symbol.name, imageUrl: a.symbol.imageUrl } : null,
+  }));
+
+  const dateStr = today.toISOString().split('T')[0];
 
   return (
     <div className="flex min-h-full flex-col">
@@ -45,21 +79,12 @@ export default async function HomePage() {
         </div>
       </header>
 
-      <main className="flex flex-1 items-center justify-center p-6">
-        <div className="space-y-4 text-center">
-          <h2 className="text-2xl font-semibold">Hej, {profile.name}!</h2>
-          <p className="text-gray-600">Ditt dagsschema kommer snart.</p>
-          <div className="flex flex-wrap justify-center gap-2 text-sm text-gray-500">
-            <span className="rounded-full bg-gray-100 px-3 py-1">Vy: {profile.viewMode}</span>
-            <span className="rounded-full bg-gray-100 px-3 py-1">
-              Sensorisk: {profile.sensoryMode}
-            </span>
-            <span className="rounded-full bg-gray-100 px-3 py-1">
-              Belöning: {profile.rewardType}
-            </span>
-          </div>
-        </div>
-      </main>
+      <DaySchedule
+        activities={serializedActivities}
+        viewMode={profile.viewMode as 'BLOCKS' | 'CARDS' | 'TIMELINE'}
+        date={dateStr}
+        profileName={profile.name}
+      />
     </div>
   );
 }

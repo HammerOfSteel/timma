@@ -17,12 +17,12 @@ The minimum viable product — a functional day planner with visual support that
 
 ### 1.2 Authentication & User Model
 
-- [ ] Caregiver registration (email/password)
-- [ ] Caregiver login / logout
-- [ ] Household model: create & manage user profiles under one account
-- [ ] Profile switching via PIN or avatar tap
-- [ ] Admin role: edit, delete, add profiles
-- [ ] Protected routes & session management
+- [x] Caregiver registration (email/password)
+- [x] Caregiver login / logout
+- [x] Household model: create & manage user profiles under one account
+- [x] Profile switching via PIN or avatar tap
+- [x] Admin role: edit, delete, add profiles
+- [x] Protected routes & session management
 
 ### 1.3 Day Planner / Schedule View
 

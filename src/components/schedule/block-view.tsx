@@ -2,6 +2,7 @@
 
 import type { ScheduleViewProps } from './types';
 import { ActivityVisual } from './activity-visual';
+import { SignVideoPlayer } from './sign-video-player';
 
 function formatTime(iso: string) {
   const d = new Date(iso);
@@ -67,6 +68,13 @@ export function BlockView({ activities, onToggleComplete, onEdit, onDelete }: Sc
                       imageUrl={activity.imageUrl}
                       size="md"
                     />
+                    {activity.signVideo && (
+                      <SignVideoPlayer
+                        videoUrl={activity.signVideo.videoUrl}
+                        word={activity.signVideo.word}
+                        size="sm"
+                      />
+                    )}
                     <h3
                       className={`font-semibold ${activity.completed ? 'line-through text-gray-400' : ''}`}
                     >

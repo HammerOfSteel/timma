@@ -17,6 +17,11 @@ export interface ActivityData {
     name: string;
     imageUrl: string;
   } | null;
+  signVideo: {
+    id: string;
+    word: string;
+    videoUrl: string;
+  } | null;
 }
 
 export interface ScheduleViewProps {

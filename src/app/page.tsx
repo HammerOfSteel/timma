@@ -92,6 +92,7 @@ export default async function HomePage({
     imageUrl: a.imageUrl,
     recurrence: (a.recurrence as ActivityData['recurrence']) ?? null,
     symbol: a.symbol ? { id: a.symbol.id, name: a.symbol.name, imageUrl: a.symbol.imageUrl } : null,
+    signVideo: a.signVideo ? { id: a.signVideo.id, word: a.signVideo.word, videoUrl: a.signVideo.videoUrl } : null,
   }));
 
   // Determine if theme is dark

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import type { ActivityData } from './types';
 import { SymbolPicker } from './symbol-picker';
+import { SignVideoPicker } from './sign-video-picker';
 
 interface ActivityFormProps {
   date: string;
@@ -42,6 +43,12 @@ export function ActivityForm({ date, activity, onSubmit, onClose }: ActivityForm
       : null,
   );
   const [customImage, setCustomImage] = useState<string | null>(activity?.imageUrl || null);
+  const [showSignPicker, setShowSignPicker] = useState(false);
+  const [selectedSign, setSelectedSign] = useState<{
+    id: string;
+    word: string;
+    videoUrl: string;
+  } | null>(activity?.signVideo || null);
 
   function handleSymbolSelect(file: string, name: string) {
     setSelectedSymbol({ file, name });
@@ -85,6 +92,12 @@ export function ActivityForm({ date, activity, onSubmit, onClose }: ActivityForm
             )}
             {!selectedSymbol && activity?.symbol && (
               <input type="hidden" name="removeSymbol" value="true" />
+            )}
+            {selectedSign && (
+              <input type="hidden" name="signVideoId" value={selectedSign.id} />
+            )}
+            {!selectedSign && activity?.signVideo && (
+              <input type="hidden" name="removeSignVideo" value="true" />
             )}
 
             <div>
@@ -188,6 +201,35 @@ export function ActivityForm({ date, activity, onSubmit, onClose }: ActivityForm
                     />
                   </label>
                 </div>
+              </div>
+            </div>
+
+            {/* Sign video section */}
+            <div>
+              <label className="block text-sm font-medium">Tecken (Takk)</label>
+              <div className="mt-2 flex items-center gap-3">
+                {selectedSign ? (
+                  <div className="relative flex items-center gap-2 rounded-lg border border-purple-200 bg-purple-50 px-3 py-2">
+                    <span className="text-lg">🤟</span>
+                    <span className="text-sm font-medium capitalize">{selectedSign.word}</span>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedSign(null)}
+                      className="ml-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] text-white shadow"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ) : (
+                  <span className="text-xs text-gray-400">Inget tecken valt</span>
+                )}
+                <button
+                  type="button"
+                  onClick={() => setShowSignPicker(true)}
+                  className="rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50"
+                >
+                  Välj tecken
+                </button>
               </div>
             </div>
 
@@ -315,6 +357,15 @@ export function ActivityForm({ date, activity, onSubmit, onClose }: ActivityForm
 
       {showSymbolPicker && (
         <SymbolPicker onSelect={handleSymbolSelect} onClose={() => setShowSymbolPicker(false)} />
+      )}
+      {showSignPicker && (
+        <SignVideoPicker
+          onSelect={(sv) => {
+            setSelectedSign({ id: sv.id, word: sv.word, videoUrl: sv.videoUrl });
+            setShowSignPicker(false);
+          }}
+          onClose={() => setShowSignPicker(false)}
+        />
       )}
     </>
   );

@@ -65,6 +65,7 @@ model Profile {
   earnedBadges EarnedBadge[]
   todos        Todo[]
   kanbanBoards KanbanBoard[]
+  uploadedSignVideos SignVideo[] @relation("UploadedSignVideos")
 }
 
 enum Role {
@@ -116,6 +117,10 @@ model Activity {
   symbol   Symbol? @relation(fields: [symbolId], references: [id])
   imageUrl String? // Custom uploaded image
 
+  // Sign language support
+  signVideoId String?
+  signVideo   SignVideo? @relation(fields: [signVideoId], references: [id])
+
   // Rewards
   pointValue  Int     @default(0)
   earnedPoints EarnedPoint[]
@@ -146,6 +151,27 @@ model Symbol {
 
 enum SymbolSource {
   MULBERRY
+  CUSTOM
+}
+
+model SignVideo {
+  id          String    @id @default(cuid())
+  word        String    // The Swedish word this sign represents
+  videoUrl    String    // URL to the video file
+  thumbnailUrl String?  // Optional thumbnail image
+  category    String    // e.g. "mat", "aktivitet", "känsla", "tid"
+  source      SignVideoSource @default(BUILTIN)
+  createdAt   DateTime  @default(now())
+
+  // Who uploaded (null for built-in library)
+  uploadedById String?
+  uploadedBy   Profile? @relation("UploadedSignVideos", fields: [uploadedById], references: [id], onDelete: SetNull)
+
+  activities Activity[]
+}
+
+enum SignVideoSource {
+  BUILTIN
   CUSTOM
 }
 

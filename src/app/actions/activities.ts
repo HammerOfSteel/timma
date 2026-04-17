@@ -17,7 +17,7 @@ export async function getActivitiesForDate(profileId: string, date: Date) {
       startTime: { gte: startOfDay },
       endTime: { lte: endOfDay },
     },
-    include: { symbol: true },
+    include: { symbol: true, signVideo: true },
     orderBy: [{ sortOrder: 'asc' }, { startTime: 'asc' }],
   });
 }
@@ -31,7 +31,7 @@ export async function getActivitiesForRange(profileId: string, start: Date, end:
       startTime: { gte: start },
       endTime: { lte: end },
     },
-    include: { symbol: true },
+    include: { symbol: true, signVideo: true },
     orderBy: [{ startTime: 'asc' }, { sortOrder: 'asc' }],
   });
 
@@ -42,7 +42,7 @@ export async function getActivitiesForRange(profileId: string, start: Date, end:
       recurrence: { not: null },
       startTime: { lte: end },
     },
-    include: { symbol: true },
+    include: { symbol: true, signVideo: true },
   });
 
   // Expand recurring activities into per-day instances
@@ -54,7 +54,7 @@ export async function getActivitiesForRange(profileId: string, start: Date, end:
 }
 
 type ActivityWithSymbol = Awaited<
-  ReturnType<typeof prisma.activity.findMany<{ include: { symbol: true } }>>
+  ReturnType<typeof prisma.activity.findMany<{ include: { symbol: true; signVideo: true } }>>
 >[number];
 
 function expandRecurring(
@@ -172,6 +172,9 @@ export async function createActivity(formData: FormData) {
     symbolId = symbol.id;
   }
 
+  // Handle sign video
+  const signVideoId = (formData.get('signVideoId') as string) || null;
+
   const maxSort = await prisma.activity.aggregate({
     where: { profileId: session.activeProfileId },
     _max: { sortOrder: true },
@@ -188,6 +191,7 @@ export async function createActivity(formData: FormData) {
       sortOrder: (maxSort._max.sortOrder ?? 0) + 1,
       profileId: session.activeProfileId,
       symbolId,
+      signVideoId,
       recurrence,
     },
   });
@@ -223,21 +227,33 @@ export async function updateActivity(activityId: string, formData: FormData) {
   const endTime = new Date(date);
   endTime.setHours(endHour, endMinute, 0, 0);
 
+  // Handle sign video
+  const signVideoId = (formData.get('signVideoId') as string) || null;
+  const removeSignVideo = formData.get('removeSignVideo') === 'true';
+
   // Handle symbol
   const symbolFile = (formData.get('symbolFile') as string) || null;
   const symbolName = (formData.get('symbolName') as string) || null;
   const removeSymbol = formData.get('removeSymbol') === 'true';
   let symbolId: string | undefined = undefined;
 
-  if (removeSymbol) {
-    symbolId = null as unknown as undefined;
-    // Using raw update for null
+  if (removeSymbol || removeSignVideo) {
     await prisma.activity.update({
       where: { id: activityId },
-      data: { title, description, color, startTime, endTime, pointValue, recurrence, symbolId: null },
+      data: {
+        title, description, color, startTime, endTime, pointValue, recurrence,
+        ...(removeSymbol ? { symbolId: null } : {}),
+        ...(removeSignVideo ? { signVideoId: null } : {}),
+      },
     });
-    revalidatePath('/');
-    return;
+    if (removeSymbol && !removeSignVideo && !signVideoId) {
+      revalidatePath('/');
+      return;
+    }
+    if (removeSignVideo && !removeSymbol && !symbolFile) {
+      revalidatePath('/');
+      return;
+    }
   }
 
   if (symbolFile && symbolName) {
@@ -268,6 +284,7 @@ export async function updateActivity(activityId: string, formData: FormData) {
       pointValue,
       recurrence,
       ...(symbolId !== undefined ? { symbolId } : {}),
+      ...(signVideoId ? { signVideoId } : {}),
     },
   });
 
